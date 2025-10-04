@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar Assistant</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+        }
+
+        .avatar-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #avatar-container {
+            width: 100%;
+            height: 70%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-section {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: #f1f3f4;
+            color: #333;
+            margin-right: auto;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #5a6fd4;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status {
+            padding: 10px;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.1);
+            color: #333;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .speaking {
+            border: 3px solid #4CAF50;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { border-color: #4CAF50; }
+            50% { border-color: #8BC34A; }
+            100% { border-color: #4CAF50; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="avatar-section">
+            <div id="avatar-container"></div>
+            <div class="status" id="status">Loading avatar...</div>
+        </div>
+        
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>AI Assistant</h2>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    Hello! I'm your AI assistant. I can help you in multiple languages. What would you like to talk about?
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-container">
+                    <input type="text" id="messageInput" placeholder="Type your message in any language..." disabled>
+                    <button id="sendButton" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js for 3D avatar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <!-- Text-to-Viseme lip sync engine -->
+    <script src="/lipsync-en.js"></script>
+    
+    <!-- Main application -->
+    <script src="/app.js"></script>
+</body>
+</html>

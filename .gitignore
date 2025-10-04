@@ -1,0 +1,84 @@
+# Documentation and markdown files (exclude main README.md)
+*.md
+!README.md
+
+# Audio files
+audio/
+*.wav
+*.mp3
+*.ogg
+*.m4a
+
+# Log files
+*.log
+server.log
+nohup.out
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Model files and directories (exclude entire models folder)
+models/
+*.bin
+*.safetensors
+*.gguf
+*.model
+*.pt
+*.pth
+
+# Test files
+test_*.html

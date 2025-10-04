@@ -1,0 +1,14 @@
+{
+  "name": "avatar-tts-assistant",
+  "version": "1.0.0",
+  "description": "AI Assistant with Ready Player Me Avatar and TTS - Python Backend",
+  "scripts": {
+    "setup": "python setup.py",
+    "install": "pip install -r requirements.txt",
+    "start": "python backend/server.py",
+    "dev": "python backend/server.py"
+  },
+  "engines": {
+    "python": ">=3.8"
+  }
+}
