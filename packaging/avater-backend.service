@@ -1,0 +1,18 @@
+[Unit]
+Description=Avater Chatbot Backend
+After=network.target
+
+[Service]
+Type=simple
+# Run as the project user; change to the appropriate user if needed
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/Avater-Chabot/backend
+# Use the venv Python - the install script will place .venv in project root
+ExecStart=/home/ubuntu/Avater-Chabot/.venv/bin/python /home/ubuntu/Avater-Chabot/backend/server.py
+Restart=always
+RestartSec=5s
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
