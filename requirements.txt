@@ -10,7 +10,7 @@ httpx==0.25.0
 # AI/ML libraries  
 torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
 transformers==4.35.0
-tokenizers==0.15.0
+tokenizers>=0.14,<0.15
 
 # Additional utilities
 python-multipart==0.0.6

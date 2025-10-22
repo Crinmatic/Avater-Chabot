@@ -155,7 +155,7 @@ class AIAssistantServer:
                     )
                     self.model = AutoModelForCausalLM.from_pretrained(
                         "Qwen/Qwen2-1.5B-Instruct",
-                        dtype=torch.float32,  # Use float32 for CPU
+                        torch_dtype=torch.float32,  # Use torch_dtype instead of dtype
                         cache_dir=str(self.models_dir),
                         low_cpu_mem_usage=True
                     )
@@ -173,7 +173,7 @@ class AIAssistantServer:
                     )
                     self.model = AutoModelForCausalLM.from_pretrained(
                         "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-                        dtype=torch.float32,
+                        torch_dtype=torch.float32,  # Use torch_dtype instead of dtype
                         cache_dir=str(self.models_dir),
                         low_cpu_mem_usage=True
                     )
