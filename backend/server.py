@@ -23,6 +23,8 @@ import httpx
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import threading
+from typing import Dict
+import uuid
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,10 +33,12 @@ logger = logging.getLogger(__name__)
 # Request/Response models
 class ChatRequest(BaseModel):
     message: str
+    session_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
     audioUrl: Optional[str] = None
+    session_id: Optional[str] = None
 
 class HealthResponse(BaseModel):
     status: str
@@ -45,6 +49,8 @@ class HealthResponse(BaseModel):
 class AIAssistantServer:
     def __init__(self):
         self.app = FastAPI(title="AI Avatar Assistant", version="1.0.0")
+        # In-memory session storage: session_id -> list of messages
+        self.sessions: Dict[str, list] = {}
         
         # Configuration
         self.tts_url = "http://localhost:8000/synthesize"
@@ -97,10 +103,15 @@ class AIAssistantServer:
         @self.app.post("/api/chat", response_model=ChatResponse)
         async def chat_endpoint(request: ChatRequest):
             try:
-                logger.info(f"Received message: {request.message}")
+                # Manage session
+                session_id = request.session_id or str(uuid.uuid4())
+                if session_id not in self.sessions:
+                    self.sessions[session_id] = []
+                history = self.sessions[session_id]
+                logger.info(f"Session {session_id}: Received message: {request.message}")
                 
                 # Generate AI response
-                ai_response = await self.generate_response(request.message)
+                ai_response = await self.generate_response(request.message, history)
                 logger.info(f"Generated response: {ai_response[:100]}...")
                 
                 # Convert to speech
@@ -108,9 +119,15 @@ class AIAssistantServer:
                 if audio_url:
                     logger.info(f"Audio generated: {audio_url}")
                 
+                # Store conversation memory (cap last 3 pairs)
+                history.append(request.message)
+                history.append(ai_response)
+                if len(history) > 6:
+                    history[:] = history[-6:]
                 return ChatResponse(
                     response=ai_response,
-                    audioUrl=audio_url
+                    audioUrl=audio_url,
+                    session_id=session_id
                 )
                 
             except Exception as e:
@@ -191,7 +208,7 @@ class AIAssistantServer:
         model_thread = threading.Thread(target=load_model, daemon=True)
         model_thread.start()
 
-    async def generate_response(self, user_message: str) -> str:
+    async def generate_response(self, user_message: str, history: list) -> str:
         """Generate AI response from user message"""
         if not self.model_loaded or not self.model:
             return "I'm still loading my language model. Please try again in a moment."
@@ -199,11 +216,32 @@ class AIAssistantServer:
         try:
             # Handle different model types
             if "Qwen2" in self.model_name:
-                # Qwen2 format - uses chat template
+                # Qwen2 format - uses chat template with structured history
                 messages = [
-                    {"role": "system", "content": "You are a helpful, friendly AI assistant that can communicate in multiple languages. Keep responses concise and under 100 words."},
-                    {"role": "user", "content": user_message}
+                    {"role": "system", "content": """You are LeeBot, an empathetic emotional support companion created by leeLab. Your purpose is to provide compassionate, non-judgmental support to people experiencing difficult emotions.
+
+Core principles:
+- Listen with empathy and validate feelings without minimizing them
+- Ask gentle, open-ended questions to help people explore their emotions
+- Offer comfort and reassurance when appropriate
+- Respect boundaries - never force advice or solutions
+- Be warm, caring, and authentic in your responses
+- Use simple, conversational language
+- Keep responses brief (2-3 sentences) to encourage dialogue
+- Recognize when someone may need professional help and gently suggest it
+
+Remember: You're here to support, not to fix. Sometimes people just need to be heard and understood."""}
                 ]
+                
+                # Add conversation history as alternating user/assistant messages
+                for i in range(0, len(history), 2):
+                    if i < len(history):
+                        messages.append({"role": "user", "content": history[i]})
+                    if i + 1 < len(history):
+                        messages.append({"role": "assistant", "content": history[i + 1]})
+                
+                # Add current message
+                messages.append({"role": "user", "content": user_message})
                 
                 # Apply chat template
                 text = self.tokenizer.apply_chat_template(
@@ -219,11 +257,11 @@ class AIAssistantServer:
                 with torch.no_grad():
                     outputs = self.model.generate(
                         **inputs,
-                        max_new_tokens=100,
-                        temperature=0.7,
+                        max_new_tokens=80,  # Shorter for emotional support (2-3 sentences)
+                        temperature=0.8,  # Slightly higher for more natural, warm responses
                         do_sample=True,
-                        top_p=0.9,
-                        repetition_penalty=1.1,
+                        top_p=0.92,  # Slightly higher for more diverse vocabulary
+                        repetition_penalty=1.15,  # Higher to avoid repetitive phrases
                         pad_token_id=self.tokenizer.eos_token_id,
                         eos_token_id=self.tokenizer.eos_token_id
                     )
@@ -232,19 +270,33 @@ class AIAssistantServer:
                 response = self.tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
                 
             elif "TinyLlama" in self.model_name:
-                # TinyLlama format - uses special tokens
-                prompt = f"<|system|>\nYou are a helpful assistant. Keep responses under 100 words.</s>\n<|user|>\n{user_message}</s>\n<|assistant|>\n"
+                # TinyLlama format - build conversation with history
+                prompt = """<|system|>
+You are LeeBot, an empathetic emotional support companion from leeLab. Listen with compassion, validate feelings, and respond with warmth. Keep responses brief (2-3 sentences) and ask gentle questions to encourage dialogue. Never judge or minimize emotions.</s>
+"""
+                
+                # Add conversation history
+                for i in range(0, len(history), 2):
+                    if i < len(history):
+                        prompt += f"<|user|>\n{history[i]}</s>\n"
+                    if i + 1 < len(history):
+                        prompt += f"<|assistant|>\n{history[i + 1]}</s>\n"
+                
+                # Add current message
+                prompt += f"<|user|>\n{user_message}</s>\n<|assistant|>\n"
+                
+                logger.info(f"Prompt with history ({len(history)} messages): {prompt[:200]}...")
                 
                 inputs = self.tokenizer(prompt, return_tensors="pt", return_attention_mask=True)
                 
                 with torch.no_grad():
                     outputs = self.model.generate(
                         **inputs,
-                        max_new_tokens=100,
-                        temperature=0.7,
+                        max_new_tokens=80,  # Shorter for emotional support
+                        temperature=0.8,  # More natural warmth
                         do_sample=True,
-                        top_p=0.9,
-                        repetition_penalty=1.1,
+                        top_p=0.92,
+                        repetition_penalty=1.15,
                         pad_token_id=self.tokenizer.eos_token_id
                     )
                 
@@ -278,23 +330,36 @@ class AIAssistantServer:
             return self.get_fallback_response(user_message)
 
     def get_fallback_response(self, user_message: str) -> str:
-        """Provide rule-based fallback responses"""
+        """Provide empathetic rule-based fallback responses"""
         message_lower = user_message.lower()
         
-        # Language detection and responses
+        # Emotional support fallbacks
         fallbacks = {
-            'hello': "Hello! I'm your AI assistant. How can I help you today?",
-            'hi': "Hi there! What can I help you with?",
-            'hola': "¡Hola! Soy tu asistente de IA. ¿Cómo puedo ayudarte hoy?",
-            'buenos días': "¡Buenos días! ¿En qué puedo ayudarte?",
-            'bonjour': "Bonjour! Je suis votre assistant IA. Comment puis-je vous aider?",
-            'salut': "Salut! Comment ça va? Comment puis-je vous aider?",
-            'guten tag': "Guten Tag! Ich bin Ihr KI-Assistent. Wie kann ich Ihnen helfen?",
-            'hallo': "Hallo! Wie kann ich Ihnen heute helfen?",
-            'konnichiwa': "こんにちは！私はあなたのAIアシスタントです。どのようにお手伝いできますか？",
-            'how are you': "I'm doing well, thank you! I'm here and ready to help you with anything you need.",
-            'what is your name': "I'm your AI assistant! I can help you in multiple languages.",
-            'help': "I'm here to help! You can ask me questions in multiple languages, and I'll do my best to assist you."
+            # Greetings - warm and welcoming
+            'hello': "Hello! I'm LeeBot from leeLab. I'm here to listen and support you. How are you feeling today?",
+            'hi': "Hi there! I'm glad you're here. What's on your mind?",
+            'hey': "Hey! I'm here for you. Would you like to talk about something?",
+            
+            # Emotional states - validation and empathy
+            'sad': "I hear that you're feeling sad. That must be really difficult. Would you like to share what's weighing on you?",
+            'depressed': "I'm so sorry you're going through this. Depression can feel so heavy. You're not alone in this.",
+            'anxious': "Anxiety can be so overwhelming. I'm here to listen without judgment. What's making you feel anxious?",
+            'stressed': "Stress can really take a toll. Take a deep breath with me. What's been stressing you out?",
+            'lonely': "Feeling lonely is so hard. I'm here with you right now. Would you like to talk about it?",
+            'angry': "It's okay to feel angry. Your feelings are valid. What's been bothering you?",
+            'tired': "It sounds like you're exhausted. That's completely understandable. How can I support you right now?",
+            'overwhelmed': "Being overwhelmed is exhausting. Let's take this one step at a time together. What feels most pressing?",
+            
+            # Common situations
+            'help': "I'm here to help and support you emotionally. You can share anything that's on your mind - I'm listening.",
+            'talk': "Of course, I'm here to talk. What would you like to share with me?",
+            'listen': "I'm here, and I'm listening. Take your time and share whatever you're comfortable with.",
+            'how are you': "Thank you for asking! I'm here and ready to support you. But more importantly - how are *you* doing?",
+            
+            # Crisis indicators - gentle professional referral
+            'suicide': "I'm really concerned about you. Please reach out to a crisis helpline immediately: 988 (US) or your local emergency services. You deserve support from professionals who can help.",
+            'hurt myself': "I care about your safety. Please contact a crisis helpline now: 988 (US) or emergency services. You don't have to face this alone.",
+            'end it': "Please reach out for help right now: call 988 or your local crisis line. You matter, and there are people who want to help you through this."
         }
         
         # Check for keyword matches
@@ -302,8 +367,8 @@ class AIAssistantServer:
             if key in message_lower:
                 return response
         
-        # Default response
-        return "I understand you're trying to communicate with me. I'm here to help! Could you please tell me more about what you need assistance with?"
+        # Default empathetic response
+        return "I'm here to listen and support you. Whatever you're going through, you don't have to face it alone. Would you like to share what's on your mind?"
 
     async def check_tts_service(self) -> bool:
         """Check if TTS service is available"""

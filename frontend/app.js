@@ -12,6 +12,7 @@ class AvatarAssistant {
         this.audioAnalyser = null;
         this.currentAudio = null;
         this.morphTargets = null;
+        this.sessionId = null; // Track session ID for conversation memory
         
         // Text-to-viseme lip sync system
         this.lipsyncEngine = new LipsyncEn();
@@ -458,13 +459,16 @@ class AvatarAssistant {
             sendButton.innerHTML = '<div class="loading"></div>Thinking...';
 
             try {
-                // Send message to backend
+                // Send message to backend with session ID for memory
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ message }),
+                    body: JSON.stringify({ 
+                        message,
+                        session_id: this.sessionId // Send session ID to maintain conversation
+                    }),
                 });
 
                 if (!response.ok) {
@@ -472,6 +476,11 @@ class AvatarAssistant {
                 }
 
                 const data = await response.json();
+                
+                // Store session ID from response for future messages
+                if (data.session_id) {
+                    this.sessionId = data.session_id;
+                }
                 
                 // Add AI response to chat
                 this.addMessage(data.response, 'ai');
