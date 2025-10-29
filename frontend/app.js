@@ -31,7 +31,7 @@ class AvatarAssistant {
         
         // Scene setup
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0xf0f0f0);
+        this.scene.background = new THREE.Color(0x0a0814);
 
         // Camera setup - Closer for headshot view
         this.camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
