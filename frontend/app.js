@@ -13,6 +13,7 @@ class AvatarAssistant {
         this.currentAudio = null;
         this.morphTargets = null;
         this.sessionId = null; // Track session ID for conversation memory
+        this.currentAvatarUrl = 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none';
         
         // Text-to-viseme lip sync system
         this.lipsyncEngine = new LipsyncEn();
@@ -21,9 +22,13 @@ class AvatarAssistant {
         this.visemeStartTime = 0;
         this.currentResponseText = '';
         
+        // Thumbnail renderers
+        this.thumbnailRenderers = [];
+        
         this.init();
         this.setupChat();
         this.setupAudioContext();
+        this.setupAvatarSelector();
     }
 
     init() {
@@ -63,22 +68,24 @@ class AvatarAssistant {
         this.animate();
     }
 
-    loadAvatar() {
+    loadAvatar(avatarUrl = null) {
         const loader = new THREE.GLTFLoader();
         
-        // Ready Player Me API - Request avatar with morph targets
-        // Documentation: https://docs.readyplayer.me/ready-player-me/api-reference/rest-api/avatars/get-3d-avatars
-        // Options: "ARKit", "Oculus Visemes", or both "ARKit,Oculus Visemes"
+        // Use provided URL or current avatar URL
+        const url = avatarUrl || this.currentAvatarUrl;
         
-        // Using ARKit which includes: jawOpen, mouthOpen, mouthSmile, etc.
-        // AND Oculus Visemes for better lip sync
-        const avatarUrl = 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none';
-        
-        console.log('🔄 Loading avatar with morph targets from:', avatarUrl);
+        console.log('🔄 Loading avatar with morph targets from:', url);
         this.updateStatus('Loading your avatar...');
         
+        // Remove existing avatar if any
+        if (this.avatar) {
+            this.scene.remove(this.avatar);
+            this.avatar = null;
+            this.morphTargets = null;
+        }
+        
         loader.load(
-            avatarUrl,
+            url,
             (gltf) => {
                 this.avatar = gltf.scene;
                 this.avatar.scale.set(1, 1, 1);
@@ -669,6 +676,66 @@ class AvatarAssistant {
             }
             console.log('🔄 Reset all morph targets to 0');
         }
+    }
+    
+    setupAvatarSelector() {
+        // Load thumbnails for each avatar
+        const thumbnails = document.querySelectorAll('.avatar-thumbnail');
+        
+        thumbnails.forEach((thumb, index) => {
+            const avatarUrl = thumb.getAttribute('data-avatar-url');
+            this.loadThumbnail(thumb, avatarUrl, index);
+            
+            // Add click handler
+            thumb.addEventListener('click', () => {
+                // Update active state
+                thumbnails.forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+                
+                // Load new avatar
+                this.currentAvatarUrl = avatarUrl;
+                this.loadAvatar(avatarUrl);
+            });
+        });
+    }
+    
+    loadThumbnail(container, avatarUrl, index) {
+        // Create mini scene for thumbnail
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0814);
+        
+        const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+        camera.position.set(0, 1.65, 0.5);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(80, 80);
+        container.appendChild(renderer.domElement);
+        
+        // Lighting for thumbnail
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+        
+        // Load avatar for thumbnail
+        const loader = new THREE.GLTFLoader();
+        loader.load(avatarUrl, (gltf) => {
+            const avatar = gltf.scene;
+            avatar.scale.set(1, 1, 1);
+            avatar.position.set(0, 0, 0);
+            scene.add(avatar);
+            
+            // Render thumbnail
+            const animate = () => {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            };
+            animate();
+            
+            this.thumbnailRenderers.push({ scene, camera, renderer, avatar });
+        });
     }
 }
 

@@ -164,6 +164,25 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .avatar-selector {
+            position: fixed; bottom: 30px; left: 30px; display: flex; gap: 15px; z-index: 10;
+            animation: fade-in 1s ease;
+        }
+        .avatar-thumbnail {
+            width: 80px; height: 80px; border-radius: 15px; overflow: hidden; cursor: pointer;
+            border: 3px solid rgba(0, 229, 255, 0.3); background: rgba(10, 8, 20, 0.8);
+            transition: all 0.3s ease; position: relative;
+        }
+        .avatar-thumbnail:hover {
+            transform: translateY(-5px) scale(1.1); border-color: var(--neon-cyan);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.5);
+        }
+        .avatar-thumbnail.active {
+            border-color: var(--neon-pink); box-shadow: 0 0 30px rgba(230, 59, 122, 0.6);
+        }
+        .avatar-thumbnail canvas {
+            width: 100% !important; height: 100% !important;
+        }
         @media (max-width: 1024px) {
             .container { flex-direction: column; }
             .avatar-section { flex: 1; padding: 20px; }
@@ -188,6 +207,8 @@
             input[type="text"] { padding: 12px 18px; font-size: 14px; }
             button { padding: 12px 24px; font-size: 14px; }
             .particle { display: none; }
+            .avatar-selector { bottom: 20px; left: 20px; gap: 10px; }
+            .avatar-thumbnail { width: 60px; height: 60px; }
         }
         @media (max-width: 480px) {
             .avatar-section { padding: 10px; }
@@ -232,6 +253,11 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="avatar-selector">
+        <div class="avatar-thumbnail active" id="avatar-thumb-0" data-avatar-url="https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none"></div>
+        <div class="avatar-thumbnail" id="avatar-thumb-1" data-avatar-url="https://models.readyplayer.me/69024955f2f24d4396d2fca0.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none"></div>
+        <div class="avatar-thumbnail" id="avatar-thumb-2" data-avatar-url="https://models.readyplayer.me/69024a74f2f24d4396d31dbd.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
