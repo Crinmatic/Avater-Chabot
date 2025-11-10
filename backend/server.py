@@ -150,7 +150,7 @@ class AIAssistantServer:
         try:
             # Build messages for Groq API
             messages = [
-                {"role": "system", "content": """You are LeeBot, an empathetic emotional support companion created by leeLab. Your purpose is to provide compassionate, non-judgmental support to people experiencing difficult emotions.
+                {"role": "system", "content": """You are AvaterConnect, an empathetic emotional support companion created by leeLab. Your purpose is to provide compassionate, non-judgmental support to people experiencing difficult emotions.
 
 Core principles:
 - Listen with empathy and validate feelings without minimizing them
@@ -217,7 +217,7 @@ Remember: You're here to support, not to fix. Sometimes people just need to be h
         # Emotional support fallbacks
         fallbacks = {
             # Greetings - warm and welcoming
-            'hello': "Hello! I'm LeeBot from leeLab. I'm here to listen and support you. How are you feeling today?",
+            'hello': "Hello! I'm AvaterConnect from leeLab. I'm here to listen and support you. How are you feeling today?",
             'hi': "Hi there! I'm glad you're here. What's on your mind?",
             'hey': "Hey! I'm here for you. Would you like to talk about something?",
             
