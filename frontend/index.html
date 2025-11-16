@@ -156,6 +156,194 @@
             border-top: 3px solid var(--neon-cyan); border-radius: 50%; animation: spin 0.8s linear infinite;
             margin-right: 10px; vertical-align: middle;
         }
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 260px;
+            height: 100%;
+            background-color: #1e1e1e;
+            color: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        #closeSidebar {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .sidebar-content {
+            margin-top: 20px;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            background-color: #2c2c2c;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-align: left;
+        }
+
+        .sidebar-btn:hover {
+            background-color: #3c3c3c;
+        }
+
+        .sidebar-section {
+            margin-top: 20px;
+            font-size: 16px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .chat-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .chat-list li {
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #2c2c2c;
+            margin-bottom: 5px;
+        }
+
+        .chat-list li:hover {
+            background-color: #3c3c3c;
+        }
+
+        /* Sidebar toggle button */
+        .open-sidebar-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #1e1e1e;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 10000;
+            transition: opacity 0.3s ease;
+        }
+
+        .open-sidebar-btn:hover {
+            background-color: #333;
+        }
+
+        /* Modal background overlay */
+        .modal {
+            display: none; /* hidden by default */
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal box */
+        .modal-content {
+            background: #1e1e1e;
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .setting {
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting label {
+            font-size: 1rem;
+        }
+
+        .setting select {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .save-btn {
+            width: 100%;
+            margin-top: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #005fcc;
+        }
+
+        /* Close icon */
+        .close {
+            float: right;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: white;
+        }
+
+        /* Simple fade-in */
+        @keyframes fadeIn {
+            from {opacity: 0; transform: scale(0.95);}
+            to {opacity: 1; transform: scale(1);}
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -233,6 +421,63 @@
             </div>
         </div>
     </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button id="openSidebar" class="open-sidebar-btn">☰</button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>AI Avatar Assistant</h2>
+            <button id="closeSidebar">×</button>
+        </div>
+        <div class="sidebar-content">
+            <button class="sidebar-btn">New Chat</button>
+            <button id="settingsBtn" class="sidebar-btn">Settings</button>
+            <h3 class="sidebar-section">Chats</h3>
+            <ul class="chat-list">
+                <li>History Exam Prep</li>
+                <li>CompSci Group Project</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeSettings">&times;</span>
+            <h2>Settings</h2>
+
+            <div class="setting">
+                <label>Theme:</label>
+                <select>
+                    <option>Light</option>
+                    <option>Dark</option>
+                </select>
+            </div>
+
+            <div class="setting">
+                <label>Avatar Voice:</label>
+                <select>
+                    <option>Male</option>
+                    <option>Female</option>
+                </select>
+            </div>
+
+            <div class="setting">
+                <label>Language:</label>
+                <select>
+                    <option>English</option>
+                    <option>French</option>
+                    <option>Spanish</option>
+                </select>
+            </div>
+
+            <button class="save-btn">Save (demo)</button>
+        </div>
+    </div>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="/lipsync-en.js"></script>

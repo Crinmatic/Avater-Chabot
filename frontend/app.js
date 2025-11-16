@@ -677,3 +677,43 @@ document.addEventListener('DOMContentLoaded', () => {
     window.avatarInstance = new AvatarAssistant();
     console.log('💡 Debug: Access avatar instance via window.avatarInstance');
 });
+
+// Sidebar Toggle Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById("sidebar");
+  const openBtn = document.getElementById("openSidebar");
+  const closeBtn = document.getElementById("closeSidebar");
+
+  openBtn.addEventListener("click", () => {
+    sidebar.classList.add("open");
+    openBtn.style.display = "none";
+  });
+
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    openBtn.style.display = "block";
+  });
+});
+
+// Settings Modal Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsModal = document.getElementById("settingsModal");
+  const closeSettings = document.getElementById("closeSettings");
+
+  if (settingsBtn && settingsModal && closeSettings) {
+    settingsBtn.addEventListener("click", () => {
+      settingsModal.style.display = "flex";
+    });
+
+    closeSettings.addEventListener("click", () => {
+      settingsModal.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.style.display = "none";
+      }
+    });
+  }
+});
