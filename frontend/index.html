@@ -386,6 +386,16 @@
             .input-container { gap: 10px; }
             button { padding: 12px 20px; font-size: 13px; }
         }
+
+        /* RTL Support for Persian */
+        [dir="rtl"] .sidebar { left: auto; right: -260px; box-shadow: -2px 0 10px rgba(0, 0, 0, 0.4); }
+        [dir="rtl"] .sidebar.open { right: 0; }
+        [dir="rtl"] .open-sidebar-btn { left: auto; right: 20px; }
+        [dir="rtl"] .close { float: left; }
+        [dir="rtl"] .sidebar-btn { text-align: right; }
+        [dir="rtl"] .message { text-align: right; }
+        [dir="rtl"] .user-message { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .ai-message { margin-left: auto; margin-right: 0; }
     </style>
 </head>
 <body>
@@ -400,7 +410,7 @@
         <div class="avatar-section">
             <div class="avatar-wrapper">
                 <div id="avatar-container"></div>
-                <div class="status" id="status">Initializing LeeBot...</div>
+                <div class="status" id="status" data-i18n="statusInit">Initializing LeeBot...</div>
             </div>
         </div>
         <div class="chat-section">
@@ -409,14 +419,14 @@
                 <p>EMOTIONAL SUPPORT • LEELAB</p>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message ai-message">
+                <div class="message ai-message" data-i18n="welcomeMessage">
                     Hello! I'm LeeBot, your emotional support companion from leeLab. I'm here to listen and support you. How are you feeling today?
                 </div>
             </div>
             <div class="chat-input">
                 <div class="input-container">
-                    <input type="text" id="messageInput" placeholder="Share what's on your mind..." disabled>
-                    <button id="sendButton" disabled>Send</button>
+                    <input type="text" id="messageInput" data-i18n-placeholder="placeholder" placeholder="Share what's on your mind..." disabled>
+                    <button id="sendButton" data-i18n="sendBtn" disabled>Send</button>
                 </div>
             </div>
         </div>
@@ -428,13 +438,13 @@
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h2>AI Avatar Assistant</h2>
+            <h2 data-i18n="sidebarTitle">AI Avatar Assistant</h2>
             <button id="closeSidebar">×</button>
         </div>
         <div class="sidebar-content">
-            <button class="sidebar-btn">New Chat</button>
-            <button id="settingsBtn" class="sidebar-btn">Settings</button>
-            <h3 class="sidebar-section">Chats</h3>
+            <button class="sidebar-btn" data-i18n="newChat">New Chat</button>
+            <button id="settingsBtn" class="sidebar-btn" data-i18n="settings">Settings</button>
+            <h3 class="sidebar-section" data-i18n="historyTitle">Chats</h3>
             <ul class="chat-list">
                 <li>History Exam Prep</li>
                 <li>CompSci Group Project</li>
@@ -446,10 +456,10 @@
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeSettings">&times;</span>
-            <h2>Settings</h2>
+            <h2 data-i18n="settings">Settings</h2>
 
             <div class="setting">
-                <label>Theme:</label>
+                <label data-i18n="theme">Theme:</label>
                 <select>
                     <option>Light</option>
                     <option>Dark</option>
@@ -457,7 +467,7 @@
             </div>
 
             <div class="setting">
-                <label>Avatar Voice:</label>
+                <label data-i18n="voice">Avatar Voice:</label>
                 <select>
                     <option>Male</option>
                     <option>Female</option>
@@ -465,16 +475,16 @@
             </div>
 
             <div class="setting">
-                <label>Menu Language:</label>
-                <select>
-                    <option>English</option>
-                    <option>Persian</option>
-                    <option>Yoruba</option>
-                    <option>Hokkien</option>
+                <label data-i18n="language">Menu Language:</label>
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="fa">Persian</option>
+                    <option value="yo">Yoruba</option>
+                    <option value="nan">Hokkien</option>
                 </select>
             </div>
 
-            <button class="save-btn">Save</button>
+            <button class="save-btn" id="saveSettingsBtn" data-i18n="save">Save</button>
         </div>
     </div>
 

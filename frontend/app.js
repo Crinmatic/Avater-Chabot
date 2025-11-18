@@ -1,3 +1,26 @@
+const translations = {
+    en: { statusInit: "Initializing LeeBot...", welcomeMessage: "Hello! I'm LeeBot, your emotional support companion from leeLab. I'm here to listen and support you. How are you feeling today?", placeholder: "Share what's on your mind...", sendBtn: "Send", sidebarTitle: "AI Avatar Assistant", newChat: "New Chat", settings: "Settings", historyTitle: "Chats", theme: "Theme:", voice: "Avatar Voice:", language: "Menu Language:", save: "Save", statusListening: "Listening...", statusThinking: "Thinking...", statusSpeaking: "Speaking...", statusLoading: "Loading avatar...", errorMsg: "Sorry, I encountered an error. Please try again." },
+    fa: { statusInit: "در حال راه‌اندازی لی‌بات...", welcomeMessage: "سلام! من لی‌بات هستم. امروز چه احساسی دارید؟", placeholder: "آنچه در ذهن دارید را به اشتراک بگذارید...", sendBtn: "ارسال", sidebarTitle: "دستیار آواتار هوشمند", newChat: "چت جدید", settings: "تنظیمات", historyTitle: "تاریخچه", theme: "تم:", voice: "صدای آواتار:", language: "زبان منو:", save: "ذخیره", statusListening: "در حال گوش دادن...", statusThinking: "در حال فکر کردن...", statusSpeaking: "در حال صحبت...", statusLoading: "در حال بارگذاری آواتار...", errorMsg: "متاسفم، مشکلی پیش آمد." },
+    yo: { statusInit: "O n bẹrẹ LeeBot...", welcomeMessage: "Kaabo! Emi ni LeeBot. Bawo ni o ṣe lero loni?", placeholder: "Pin ohun ti o wa ni ọkan rẹ...", sendBtn: "Fi ranṣẹ", sidebarTitle: "Oluranlọwọ Avatar AI", newChat: "Ifọrọwerọ Tuntun", settings: "Ètò", historyTitle: "Awọn iwiregbe", theme: "Àwọ̀:", voice: "Ohùn Avatar:", language: "Ede Akojọ:", save: "Fipamọ", statusListening: "N tẹtisi...", statusThinking: "N ronu...", statusSpeaking: "N sọrọ...", statusLoading: "N kojọpọ avatar...", errorMsg: "Ma binu, mo ni aṣiṣe kan." },
+    nan: { statusInit: "LeeBot 啟動中...", welcomeMessage: "你好! 我是 LeeBot。你今天感覺如何？", placeholder: "分享你在想什麼...", sendBtn: "送出", sidebarTitle: "AI 虛擬助手", newChat: "新開講", settings: "設定", historyTitle: "歷史", theme: "主題:", voice: "聲音:", language: "選單語言:", save: "儲存", statusListening: "聽你在說...", statusThinking: "想看覓...", statusSpeaking: "講話中...", statusLoading: "Avatar 載入中...", errorMsg: "歹勢，出了一點問題。" }
+};
+
+function setLanguage(lang) {
+    if (!translations[lang]) return;
+    if (lang === 'fa') document.documentElement.setAttribute('dir', 'rtl');
+    else document.documentElement.setAttribute('dir', 'ltr');
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = translations[lang][el.getAttribute('data-i18n')];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = translations[lang][el.getAttribute('data-i18n-placeholder')];
+    });
+    
+    // Update dynamic instance strings if they exist
+    if (window.avatarInstance) window.avatarInstance.currentLang = lang;
+}
+
 class AvatarAssistant {
     constructor() {
         this.scene = null;
@@ -13,6 +36,7 @@ class AvatarAssistant {
         this.currentAudio = null;
         this.morphTargets = null;
         this.sessionId = null; // Track session ID for conversation memory
+        this.currentLang = 'en'; // Default Menu Language
         
         // Text-to-viseme lip sync system
         this.lipsyncEngine = new LipsyncEn();
@@ -24,6 +48,10 @@ class AvatarAssistant {
         this.init();
         this.setupChat();
         this.setupAudioContext();
+    }
+
+    t(key) {
+        return translations[this.currentLang][key] || translations['en'][key];
     }
 
     init() {
@@ -75,7 +103,7 @@ class AvatarAssistant {
         const avatarUrl = 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none';
         
         console.log('🔄 Loading avatar with morph targets from:', avatarUrl);
-        this.updateStatus('Loading your avatar...');
+        this.updateStatus(this.t('statusLoading'));
         
         loader.load(
             avatarUrl,
@@ -456,7 +484,8 @@ class AvatarAssistant {
             this.addMessage(message, 'user');
             messageInput.value = '';
             sendButton.disabled = true;
-            sendButton.innerHTML = '<div class="loading"></div>Thinking...';
+            sendButton.innerHTML = `<div class="loading"></div>${this.t('statusThinking')}`;
+            this.updateStatus(this.t('statusThinking'));
 
             try {
                 // Send message to backend with session ID for memory
@@ -492,10 +521,10 @@ class AvatarAssistant {
 
             } catch (error) {
                 console.error('Error:', error);
-                this.addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+                this.addMessage(this.t('errorMsg'), 'ai');
             } finally {
                 sendButton.disabled = false;
-                sendButton.textContent = 'Send';
+                sendButton.textContent = this.t('sendBtn');
             }
         };
 
@@ -585,7 +614,7 @@ class AvatarAssistant {
         this.isSpeaking = true;
         const container = document.getElementById('avatar-container');
         container.classList.add('speaking');
-        this.updateStatus('Speaking...');
+        this.updateStatus(this.t('statusSpeaking'));
         
         // Convert text to viseme sequence using TalkingHead approach
         if (this.currentResponseText && this.lipsyncEngine) {
@@ -642,7 +671,7 @@ class AvatarAssistant {
         this.isSpeaking = false;
         const container = document.getElementById('avatar-container');
         container.classList.remove('speaking');
-        this.updateStatus('Listening...');
+        this.updateStatus(this.t('statusListening'));
         
         // Clear viseme queue
         this.visemeQueue = [];
@@ -696,24 +725,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Settings Modal Logic
+// Settings Modal Logic & Language Switcher
 document.addEventListener("DOMContentLoaded", () => {
-  const settingsBtn = document.getElementById("settingsBtn");
-  const settingsModal = document.getElementById("settingsModal");
-  const closeSettings = document.getElementById("closeSettings");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsModal = document.getElementById("settingsModal");
+    const closeSettings = document.getElementById("closeSettings");
+    
+    // NEW: Get these elements
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const languageSelect = document.getElementById("languageSelect");
 
-  if (settingsBtn && settingsModal && closeSettings) {
-    settingsBtn.addEventListener("click", () => {
-      settingsModal.style.display = "flex";
-    });
+    if (settingsBtn && settingsModal && closeSettings) {
+        settingsBtn.addEventListener("click", () => settingsModal.style.display = "flex");
+        closeSettings.addEventListener("click", () => settingsModal.style.display = "none");
+        window.addEventListener("click", (e) => {
+            if (e.target === settingsModal) settingsModal.style.display = "none";
+        });
 
-    closeSettings.addEventListener("click", () => {
-      settingsModal.style.display = "none";
-    });
-
-    window.addEventListener("click", (e) => {
-      if (e.target === settingsModal) {
-        settingsModal.style.display = "none";
-      }
-    });
-  }
+        // NEW: Handle Save Button
+        if (saveSettingsBtn && languageSelect) {
+            saveSettingsBtn.addEventListener("click", () => {
+                setLanguage(languageSelect.value); // Switch language
+                settingsModal.style.display = "none"; // Close modal
+            });
+        }
+    }
 });
