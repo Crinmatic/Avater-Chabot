@@ -396,6 +396,92 @@
         [dir="rtl"] .message { text-align: right; }
         [dir="rtl"] .user-message { margin-right: auto; margin-left: 0; }
         [dir="rtl"] .ai-message { margin-left: auto; margin-right: 0; }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+        body.light-mode {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+
+        /* Sidebar & Modal Light Mode */
+        body.light-mode .sidebar, 
+        body.light-mode .modal-content {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+        }
+        
+        body.light-mode .sidebar-btn, 
+        body.light-mode .chat-list li,
+        body.light-mode .setting select {
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        
+        body.light-mode .sidebar-btn:hover,
+        body.light-mode .chat-list li:hover {
+            background-color: #e2e8f0;
+        }
+
+        body.light-mode #closeSidebar,
+        body.light-mode .close {
+            color: #555;
+        }
+
+        body.light-mode .open-sidebar-btn {
+            background-color: #fff;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Chat Area Light Mode */
+        body.light-mode .chat-section {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255,255,255,0.5);
+        }
+
+        body.light-mode .chat-header {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        body.light-mode .chat-header h2 {
+            /* Reset gradient text for better readability on light */
+            background: none;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset; 
+            color: #3d1e6d; 
+        }
+
+        body.light-mode .chat-input {
+            background: #ffffff;
+            border-top: 1px solid #eee;
+        }
+
+        body.light-mode input[type="text"] {
+            background: #f0f2f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        body.light-mode .ai-message {
+            background: #ffffff;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        body.light-mode .user-message {
+            color: #fff; /* Keep user text white as the bubble is still colorful */
+        }
+        
+        /* Status pill */
+        body.light-mode .status {
+            background: rgba(255, 255, 255, 0.8);
+            color: #3d1e6d;
+            border-color: rgba(61, 30, 109, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -460,9 +546,9 @@
 
             <div class="setting">
                 <label data-i18n="theme">Theme:</label>
-                <select>
-                    <option>Light</option>
-                    <option>Dark</option>
+                <select id="themeSelect">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
                 </select>
             </div>
 

@@ -724,29 +724,51 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Settings Modal Logic
-// Settings Modal Logic & Language Switcher
+// Settings Modal Logic, Language & Theme Switcher
 document.addEventListener("DOMContentLoaded", () => {
     const settingsBtn = document.getElementById("settingsBtn");
     const settingsModal = document.getElementById("settingsModal");
     const closeSettings = document.getElementById("closeSettings");
-    
-    // NEW: Get these elements
     const saveSettingsBtn = document.getElementById("saveSettingsBtn");
     const languageSelect = document.getElementById("languageSelect");
+    const themeSelect = document.getElementById("themeSelect"); // NEW
 
     if (settingsBtn && settingsModal && closeSettings) {
-        settingsBtn.addEventListener("click", () => settingsModal.style.display = "flex");
-        closeSettings.addEventListener("click", () => settingsModal.style.display = "none");
-        window.addEventListener("click", (e) => {
-            if (e.target === settingsModal) settingsModal.style.display = "none";
+        settingsBtn.addEventListener("click", () => {
+            settingsModal.style.display = "flex";
         });
 
-        // NEW: Handle Save Button
-        if (saveSettingsBtn && languageSelect) {
+        closeSettings.addEventListener("click", () => {
+            settingsModal.style.display = "none";
+        });
+
+        window.addEventListener("click", (e) => {
+            if (e.target === settingsModal) {
+                settingsModal.style.display = "none";
+            }
+        });
+
+        // Handle Save Button
+        if (saveSettingsBtn) {
             saveSettingsBtn.addEventListener("click", () => {
-                setLanguage(languageSelect.value); // Switch language
-                settingsModal.style.display = "none"; // Close modal
+                // 1. Handle Language
+                if (languageSelect) {
+                    setLanguage(languageSelect.value);
+                }
+
+                // 2. Handle Theme
+                if (themeSelect) {
+                    const theme = themeSelect.value;
+                    if (theme === 'light') {
+                        document.body.classList.add('light-mode');
+                    } else {
+                        document.body.classList.remove('light-mode');
+                    }
+                    console.log("Theme set to:", theme);
+                }
+
+                // Close Modal
+                settingsModal.style.display = "none";
             });
         }
     }
