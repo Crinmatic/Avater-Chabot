@@ -1,8 +1,8 @@
 const translations = {
-    en: { statusInit: "Initializing AvatarConnect...", welcomeMessage: "Hello! I'm AvatarConnect, your emotional support companion from leeLab. I'm here to listen and support you. How are you feeling today?", placeholder: "Share what's on your mind...", sendBtn: "Send", sidebarTitle: "AI Avatar Assistant", newChat: "New Chat", settings: "Settings", historyTitle: "Chats", theme: "Theme:", voice: "Avatar Voice:", language: "Menu Language:", save: "Save", statusListening: "Listening...", statusThinking: "Thinking...", statusSpeaking: "Speaking...", statusLoading: "Loading avatar...", errorMsg: "Sorry, I encountered an error. Please try again." },
+    en: { statusInit: "Initializing LeeBot...", welcomeMessage: "Hello! I'm LeeBot, your emotional support companion from leeLab. I'm here to listen and support you. How are you feeling today?", placeholder: "Share what's on your mind...", sendBtn: "Send", sidebarTitle: "AI Avatar Assistant", newChat: "New Chat", settings: "Settings", historyTitle: "Chats", theme: "Theme:", voice: "Avatar Voice:", language: "Menu Language:", save: "Save", statusListening: "Listening...", statusThinking: "Thinking...", statusSpeaking: "Speaking...", statusLoading: "Loading avatar...", errorMsg: "Sorry, I encountered an error. Please try again." },
     fa: { statusInit: "در حال راه‌اندازی لی‌بات...", welcomeMessage: "سلام! من لی‌بات هستم. امروز چه احساسی دارید؟", placeholder: "آنچه در ذهن دارید را به اشتراک بگذارید...", sendBtn: "ارسال", sidebarTitle: "دستیار آواتار هوشمند", newChat: "چت جدید", settings: "تنظیمات", historyTitle: "تاریخچه", theme: "تم:", voice: "صدای آواتار:", language: "زبان منو:", save: "ذخیره", statusListening: "در حال گوش دادن...", statusThinking: "در حال فکر کردن...", statusSpeaking: "در حال صحبت...", statusLoading: "در حال بارگذاری آواتار...", errorMsg: "متاسفم، مشکلی پیش آمد." },
-    yo: { statusInit: "O n bẹrẹ AvatarConnect...", welcomeMessage: "Kaabo! Emi ni AvatarConnect. Bawo ni o ṣe lero loni?", placeholder: "Pin ohun ti o wa ni ọkan rẹ...", sendBtn: "Fi ranṣẹ", sidebarTitle: "Oluranlọwọ Avatar AI", newChat: "Ifọrọwerọ Tuntun", settings: "Ètò", historyTitle: "Awọn iwiregbe", theme: "Àwọ̀:", voice: "Ohùn Avatar:", language: "Ede Akojọ:", save: "Fipamọ", statusListening: "N tẹtisi...", statusThinking: "N ronu...", statusSpeaking: "N sọrọ...", statusLoading: "N kojọpọ avatar...", errorMsg: "Ma binu, mo ni aṣiṣe kan." },
-    nan: { statusInit: "AvatarConnect 啟動中...", welcomeMessage: "你好! 我是 AvatarConnect。你今天感覺如何？", placeholder: "分享你在想什麼...", sendBtn: "送出", sidebarTitle: "AI 虛擬助手", newChat: "新開講", settings: "設定", historyTitle: "歷史", theme: "主題:", voice: "聲音:", language: "選單語言:", save: "儲存", statusListening: "聽你在說...", statusThinking: "想看覓...", statusSpeaking: "講話中...", statusLoading: "Avatar 載入中...", errorMsg: "歹勢，出了一點問題。" }
+    yo: { statusInit: "O n bẹrẹ LeeBot...", welcomeMessage: "Kaabo! Emi ni LeeBot. Bawo ni o ṣe lero loni?", placeholder: "Pin ohun ti o wa ni ọkan rẹ...", sendBtn: "Fi ranṣẹ", sidebarTitle: "Oluranlọwọ Avatar AI", newChat: "Ifọrọwerọ Tuntun", settings: "Ètò", historyTitle: "Awọn iwiregbe", theme: "Àwọ̀:", voice: "Ohùn Avatar:", language: "Ede Akojọ:", save: "Fipamọ", statusListening: "N tẹtisi...", statusThinking: "N ronu...", statusSpeaking: "N sọrọ...", statusLoading: "N kojọpọ avatar...", errorMsg: "Ma binu, mo ni aṣiṣe kan." },
+    nan: { statusInit: "LeeBot 啟動中...", welcomeMessage: "你好! 我是 LeeBot。你今天感覺如何？", placeholder: "分享你在想什麼...", sendBtn: "送出", sidebarTitle: "AI 虛擬助手", newChat: "新開講", settings: "設定", historyTitle: "歷史", theme: "主題:", voice: "聲音:", language: "選單語言:", save: "儲存", statusListening: "聽你在說...", statusThinking: "想看覓...", statusSpeaking: "講話中...", statusLoading: "Avatar 載入中...", errorMsg: "歹勢，出了一點問題。" }
 };
 
 function setLanguage(lang) {
@@ -17,16 +17,8 @@ function setLanguage(lang) {
         el.placeholder = translations[lang][el.getAttribute('data-i18n-placeholder')];
     });
     
-    // Update dynamic instance strings and reload avatar if language changed
-    if (window.avatarInstance) {
-        const oldLang = window.avatarInstance.currentLang;
-        window.avatarInstance.currentLang = lang;
-        
-        // Reload avatar if language changed (different avatar models for different languages)
-        if (oldLang !== lang) {
-            window.avatarInstance.reloadAvatar();
-        }
-    }
+    // Update dynamic instance strings if they exist
+    if (window.avatarInstance) window.avatarInstance.currentLang = lang;
 }
 
 class AvatarAssistant {
@@ -67,7 +59,7 @@ class AvatarAssistant {
         
         // Scene setup
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x1a1a2e); // Dark purple-blue
+        this.scene.background = new THREE.Color(0xf0f0f0);
 
         // Camera setup - Closer for headshot view
         this.camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -99,19 +91,6 @@ class AvatarAssistant {
         this.animate();
     }
 
-    getAvatarUrl() {
-        // Avatar mapping based on selected language
-        const avatarMapping = {
-            'en': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb',
-            'fa': 'https://models.readyplayer.me/691df9fa1aa3af821a157927.glb',
-            'nan': 'https://models.readyplayer.me/691dfb04fb99478e41171cd4.glb',
-            'yo': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb' // Default English avatar
-        };
-        
-        const baseUrl = avatarMapping[this.currentLang] || avatarMapping['en'];
-        return `${baseUrl}?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none`;
-    }
-
     loadAvatar() {
         const loader = new THREE.GLTFLoader();
         
@@ -121,7 +100,7 @@ class AvatarAssistant {
         
         // Using ARKit which includes: jawOpen, mouthOpen, mouthSmile, etc.
         // AND Oculus Visemes for better lip sync
-        const avatarUrl = this.getAvatarUrl();
+        const avatarUrl = 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none';
         
         console.log('🔄 Loading avatar with morph targets from:', avatarUrl);
         this.updateStatus(this.t('statusLoading'));
@@ -225,46 +204,6 @@ class AvatarAssistant {
         );
     }
 
-    reloadAvatar() {
-        // Stop any current audio/speech
-        if (this.currentAudio) {
-            this.currentAudio.pause();
-            this.currentAudio = null;
-        }
-        this.isSpeaking = false;
-        this.visemeQueue = [];
-        
-        // Remove old avatar from scene completely
-        if (this.avatar) {
-            // Dispose of all materials and geometries
-            this.avatar.traverse((child) => {
-                if (child.isMesh) {
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) {
-                        if (Array.isArray(child.material)) {
-                            child.material.forEach(m => m.dispose());
-                        } else {
-                            child.material.dispose();
-                        }
-                    }
-                }
-            });
-            this.scene.remove(this.avatar);
-            this.avatar = null;
-            this.morphTargets = null;
-        }
-        
-        // Reset mixer if exists
-        if (this.mixer) {
-            this.mixer.stopAllAction();
-            this.mixer = null;
-        }
-        
-        // Load new avatar with updated language
-        this.isLoading = true;
-        this.loadAvatar();
-    }
-
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -350,18 +289,7 @@ class AvatarAssistant {
     }
 
     updateLipSync() {
-        if (!this.morphTargets) {
-            return;
-        }
-        
-        // Audio-driven lip sync for non-English languages (or when no viseme queue)
-        if (this.visemeQueue.length === 0 && this.isSpeaking) {
-            this.updateAudioDrivenLipSync();
-            return;
-        }
-        
-        // Text-based lip sync (English only)
-        if (this.visemeQueue.length === 0) {
+        if (!this.morphTargets || this.visemeQueue.length === 0) {
             return;
         }
 
@@ -487,103 +415,6 @@ class AvatarAssistant {
             sum += dataArray[i];
         }
         return (sum / count) / 255; // Normalize to 0-1
-    }
-
-    updateAudioDrivenLipSync() {
-        // Real-time audio-driven lip sync for Persian and Hokkien
-        if (!this.audioAnalyser || !this.morphTargets) return;
-
-        const influences = this.morphTargets.morphTargetInfluences;
-        const bufferLength = this.audioAnalyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        this.audioAnalyser.getByteFrequencyData(dataArray);
-
-        // Analyze frequency bands for different mouth shapes
-        const lowFreq = this.getFrequencyAverage(dataArray, 0, 10);        // Low: 0-500Hz (vowels)
-        const midFreq = this.getFrequencyAverage(dataArray, 10, 40);      // Mid: 500-2kHz (consonants)
-        const highFreq = this.getFrequencyAverage(dataArray, 40, 80);     // High: 2-4kHz (sibilants)
-
-        // Calculate overall volume
-        let sum = 0;
-        for (let i = 0; i < bufferLength; i++) {
-            sum += dataArray[i] * dataArray[i];
-        }
-        const volume = Math.sqrt(sum / bufferLength) / 255;
-        const isSpeaking = volume > 0.01;  // Lower threshold for Persian/Hokkien sensitivity
-
-        if (isSpeaking) {
-            // Get all viseme indices
-            const aaIndex = this.findMorphTarget(['viseme_aa']);  // "ah" - open mouth
-            const oIndex = this.findMorphTarget(['viseme_O']);    // "oh" - rounded lips
-            const eIndex = this.findMorphTarget(['viseme_E']);    // "eh" - spread lips
-            const iIndex = this.findMorphTarget(['viseme_I']);    // "ee" - wide smile
-            const uIndex = this.findMorphTarget(['viseme_U']);    // "oo" - pursed lips
-            const ppIndex = this.findMorphTarget(['viseme_PP']);  // "p/b/m"
-            const ssIndex = this.findMorphTarget(['viseme_SS']);  // "s/z"
-            const thIndex = this.findMorphTarget(['viseme_TH']);  // "th/f/v"
-
-            // Determine dominant viseme based on frequency profile
-            let dominantViseme = null;
-            let dominantIntensity = 0;
-
-            // Low frequencies (vowels) - choose which vowel shape
-            if (lowFreq > 0.15) {
-                if (midFreq < 0.2) {
-                    dominantViseme = aaIndex; // "ah" - open
-                    dominantIntensity = lowFreq * 0.25;
-                } else {
-                    dominantViseme = oIndex; // "oh" - rounded
-                    dominantIntensity = lowFreq * 0.22;
-                }
-            } else if (midFreq > 0.15) {
-                if (highFreq > 0.2) {
-                    dominantViseme = iIndex; // "ee" - high front
-                    dominantIntensity = (midFreq + highFreq) * 0.12;
-                } else {
-                    dominantViseme = eIndex; // "eh" - mid
-                    dominantIntensity = midFreq * 0.18;
-                }
-            } else if (highFreq > 0.2) {
-                if (midFreq > 0.1) {
-                    dominantViseme = ssIndex; // Sibilant
-                    dominantIntensity = highFreq * 0.15;
-                } else {
-                    dominantViseme = thIndex; // Fricative
-                    dominantIntensity = highFreq * 0.12;
-                }
-            }
-
-            // Apply dominant viseme with very gentle transitions
-            const allVisemes = [aaIndex, oIndex, eIndex, iIndex, uIndex, ppIndex, ssIndex, thIndex];
-            for (const idx of allVisemes) {
-                if (idx === -1) continue;
-                
-                if (idx === dominantViseme) {
-                    // Reduce intensity by 60%
-                    influences[idx] = this.smoothValue(influences[idx], dominantIntensity * 0.4, 0.2);
-                } else {
-                    influences[idx] = this.smoothValue(influences[idx], 0, 0.35); // Faster decay
-                }
-            }
-
-            // Minimal jaw movement - barely visible
-            const jawIndex = this.findMorphTarget(['jawOpen']);
-            if (jawIndex !== -1) {
-                const jawTarget = Math.min(volume * 0.15 + lowFreq * 0.08, 0.08);
-                influences[jawIndex] = this.smoothValue(influences[jawIndex], jawTarget, 0.15);
-            }
-        } else {
-            // Smooth decay to neutral when not speaking
-            for (let i = 0; i < influences.length; i++) {
-                influences[i] *= 0.7;
-                if (influences[i] < 0.01) influences[i] = 0;
-            }
-        }
-    }
-
-    smoothValue(current, target, smoothing) {
-        // Exponential smoothing for natural transitions
-        return current + (target - current) * smoothing;
     }
 
     updateJawAnimation() {
@@ -786,13 +617,8 @@ class AvatarAssistant {
         container.classList.add('speaking');
         this.updateStatus(this.t('statusSpeaking'));
         
-        // Use text-based lip sync only for English, audio-driven for Persian/Hokkien
-        const useTextLipSync = this.currentLang === 'en' && this.currentResponseText && this.lipsyncEngine;
-        
-        console.log(`🎙️ Language: ${this.currentLang} | Text-based lip sync: ${useTextLipSync ? 'YES' : 'NO (using audio-driven)'}`);
-        
-        // Convert text to viseme sequence using TalkingHead approach (English only)
-        if (useTextLipSync) {
+        // Convert text to viseme sequence using TalkingHead approach
+        if (this.currentResponseText && this.lipsyncEngine) {
             const result = this.lipsyncEngine.wordsToVisemes(this.currentResponseText);
             
             console.log('📝 Text-to-Viseme conversion (TalkingHead method):');
@@ -836,11 +662,7 @@ class AvatarAssistant {
         
         // Log lip sync status
         if (this.morphTargets) {
-            if (useTextLipSync) {
-                console.log('🎤 Lip sync: Text-to-viseme (English) with coarticulation');
-            } else {
-                console.log('🎤 Lip sync: Audio-driven (for ' + this.currentLang + ')');
-            }
+            console.log('🎤 Lip sync ACTIVE - using text-to-viseme with coarticulation');
         } else {
             console.log('⚠️ Lip sync FALLBACK - no morph targets available');
         }

@@ -20,11 +20,6 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import threading
-from typing import Dict
-import uuid
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,6 +29,7 @@ logger = logging.getLogger(__name__)
 class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
+    preferred_language: Optional[str] = 'en'  # User's selected language (en, fa, nan, yo)
 
 class ChatResponse(BaseModel):
     response: str
@@ -55,28 +51,23 @@ class AIAssistantServer:
         # Configuration
         self.tts_url = "http://localhost:8000/synthesize"
         self.port = int(os.getenv("PORT", 3000))
-        self.model_name = "microsoft/DialoGPT-small"  # Fallback to smaller model for CPU
+        self.groq_api_key = "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"
+        self.groq_api_url = "https://api.groq.com/openai/v1/chat/completions"
+        self.model_name = "llama-3.3-70b-versatile"  # Best for multilingual support
         
         # Paths - Initialize BEFORE setup_routes
         self.base_dir = Path(__file__).parent.parent
         self.audio_dir = self.base_dir / "audio"
-        self.models_dir = self.base_dir / "models"
         
         # Create directories
         self.audio_dir.mkdir(exist_ok=True)
-        self.models_dir.mkdir(exist_ok=True)
         
-        # Model components
-        self.model = None
-        self.tokenizer = None
-        self.model_loaded = False
+        # Model status
+        self.model_loaded = True  # Groq API is always available
         
         # Setup middleware and routes AFTER attributes are initialized
         self.setup_middleware()
         self.setup_routes()
-        
-        # Initialize model in background
-        self.initialize_model()
 
     def setup_middleware(self):
         """Setup CORS and other middleware"""
@@ -110,12 +101,12 @@ class AIAssistantServer:
                 history = self.sessions[session_id]
                 logger.info(f"Session {session_id}: Received message: {request.message}")
                 
-                # Generate AI response
-                ai_response = await self.generate_response(request.message, history)
+                # Generate AI response with language preference
+                ai_response = await self.generate_response(request.message, history, request.preferred_language)
                 logger.info(f"Generated response: {ai_response[:100]}...")
                 
-                # Convert to speech
-                audio_url = await self.text_to_speech(ai_response)
+                # Convert to speech with language preference
+                audio_url = await self.text_to_speech(ai_response, request.preferred_language)
                 if audio_url:
                     logger.info(f"Audio generated: {audio_url}")
                 
@@ -153,177 +144,85 @@ class AIAssistantServer:
         # Mount audio directory
         self.app.mount("/audio", StaticFiles(directory=str(self.audio_dir)), name="audio")
 
-    def initialize_model(self):
-        """Initialize the AI model in a separate thread"""
-        def load_model():
-            try:
-                logger.info("🤖 Loading multilingual AI model...")
-                logger.info(f"💻 Using CPU with {os.cpu_count()} cores")
-                
-                # Set CPU threads for optimal performance
-                torch.set_num_threads(min(os.cpu_count() or 1, 16))  # Don't exceed 16 threads per process
-                
-                # Try to load Qwen2-1.5B-Instruct (fast, multilingual, CPU-optimized)
-                try:
-                    logger.info("Attempting to load Qwen/Qwen2-1.5B-Instruct...")
-                    self.tokenizer = AutoTokenizer.from_pretrained(
-                        "Qwen/Qwen2-1.5B-Instruct",
-                        cache_dir=str(self.models_dir)
-                    )
-                    self.model = AutoModelForCausalLM.from_pretrained(
-                        "Qwen/Qwen2-1.5B-Instruct",
-                        torch_dtype=torch.float32,  # Use torch_dtype instead of dtype
-                        cache_dir=str(self.models_dir),
-                        low_cpu_mem_usage=True
-                    )
-                    self.model_name = "Qwen/Qwen2-1.5B-Instruct"
-                    logger.info("✅ Qwen2-1.5B-Instruct loaded successfully!")
-                    
-                except Exception as e:
-                    logger.warning(f"Failed to load Qwen2: {e}")
-                    logger.info("Falling back to TinyLlama...")
-                    
-                    # Fallback to TinyLlama (even smaller/faster)
-                    self.tokenizer = AutoTokenizer.from_pretrained(
-                        "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-                        cache_dir=str(self.models_dir)
-                    )
-                    self.model = AutoModelForCausalLM.from_pretrained(
-                        "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-                        torch_dtype=torch.float32,  # Use torch_dtype instead of dtype
-                        cache_dir=str(self.models_dir),
-                        low_cpu_mem_usage=True
-                    )
-                    self.model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-                    logger.info("✅ TinyLlama loaded successfully!")
-                
-                self.model_loaded = True
-                logger.info("🎉 Model initialization complete!")
-                
-            except Exception as e:
-                logger.error(f"❌ Failed to load model: {e}")
-                self.model_loaded = False
-
-        # Load model in background thread
-        model_thread = threading.Thread(target=load_model, daemon=True)
-        model_thread.start()
-
-    async def generate_response(self, user_message: str, history: list) -> str:
-        """Generate AI response from user message"""
-        if not self.model_loaded or not self.model:
-            return "I'm still loading my language model. Please try again in a moment."
-
+    async def generate_response(self, user_message: str, history: list, preferred_lang: str = 'en') -> str:
+        """Generate AI response using Groq API with strict language enforcement"""
         try:
-            # Handle different model types
-            if "Qwen2" in self.model_name:
-                # Qwen2 format - uses chat template with structured history
-                messages = [
-                    {"role": "system", "content": """You are LeeBot, an empathetic emotional support companion created by leeLab. Your purpose is to provide compassionate, non-judgmental support to people experiencing difficult emotions.
+            # Language mapping for instructions
+            lang_names = {
+                'en': 'English',
+                'fa': 'Persian (فارسی)',
+                'nan': 'Taiwanese Hokkien (台語)',
+                'yo': 'Yoruba'
+            }
+            target_lang = lang_names.get(preferred_lang, 'English')
+            
+            # Build messages for Groq API with strict language instruction
+            messages = [
+                {"role": "system", "content": f"""You are "The Student Companion," a specialized, multilingual AI assistant for undergraduate students.
 
-Core principles:
-- Listen with empathy and validate feelings without minimizing them
-- Ask gentle, open-ended questions to help people explore their emotions
-- Offer comfort and reassurance when appropriate
-- Respect boundaries - never force advice or solutions
-- Be warm, caring, and authentic in your responses
-- Use simple, conversational language
-- Keep responses brief (2-3 sentences) to encourage dialogue
-- Recognize when someone may need professional help and gently suggest it
+CRITICAL: The user has selected {target_lang} as their preferred language.
+YOU MUST RESPOND EXCLUSIVELY IN {target_lang}. DO NOT respond in any other language.
 
-Remember: You're here to support, not to fix. Sometimes people just need to be heard and understood."""}
-                ]
-                
-                # Add conversation history as alternating user/assistant messages
-                for i in range(0, len(history), 2):
-                    if i < len(history):
-                        messages.append({"role": "user", "content": history[i]})
-                    if i + 1 < len(history):
-                        messages.append({"role": "assistant", "content": history[i + 1]})
-                
-                # Add current message
-                messages.append({"role": "user", "content": user_message})
-                
-                # Apply chat template
-                text = self.tokenizer.apply_chat_template(
-                    messages,
-                    tokenize=False,
-                    add_generation_prompt=True
+Language Rules:
+- If preferred_lang is 'en' → Respond ONLY in English
+- If preferred_lang is 'fa' → Respond ONLY in Persian (فارسی)
+- If preferred_lang is 'nan' → Respond ONLY in Taiwanese Hokkien (台語), NOT Mandarin Chinese
+  * Use Hokkien vocabulary: 啥物 (not 什麼), 咱 (not 我們), 按怎 (not 怎麼), 會當 (not 可以)
+  * Use colloquial Hokkien expressions and grammar patterns
+- If preferred_lang is 'yo' → Respond ONLY in Yoruba
+
+PERSONA: Empathetic, warm, friendly student support assistant
+
+CAPABILITIES:
+- Journaling/Reflection prompts
+- Task Organization (break down assignments)
+- Time Management (Pomodoro, scheduling)
+- Assignment Help (conceptual only, never write full assignments)
+
+SAFETY: If severe distress detected → "I hear you. I am an AI and cannot provide the help you need. Please contact: National Suicide Prevention Lifeline: 988"
+
+Keep responses brief (2-4 sentences). STRICTLY use {target_lang} only."""}
+            ]
+            # Add conversation history as alternating user/assistant messages
+            for i in range(0, len(history), 2):
+                if i < len(history):
+                    messages.append({"role": "user", "content": history[i]})
+                if i + 1 < len(history):
+                    messages.append({"role": "assistant", "content": history[i + 1]})
+            
+            # Add current message
+            messages.append({"role": "user", "content": user_message})
+            
+            # Call Groq API
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    self.groq_api_url,
+                    headers={
+                        "Authorization": f"Bearer {self.groq_api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": self.model_name,
+                        "messages": messages,
+                        "temperature": 0.8,
+                        "max_tokens": 150,
+                        "top_p": 0.92,
+                        "stream": False
+                    }
                 )
                 
-                # Tokenize
-                inputs = self.tokenizer(text, return_tensors="pt", return_attention_mask=True)
+                if response.status_code != 200:
+                    logger.error(f"Groq API error: {response.status_code} - {response.text}")
+                    return self.get_fallback_response(user_message)
                 
-                # Generate
-                with torch.no_grad():
-                    outputs = self.model.generate(
-                        **inputs,
-                        max_new_tokens=80,  # Shorter for emotional support (2-3 sentences)
-                        temperature=0.8,  # Slightly higher for more natural, warm responses
-                        do_sample=True,
-                        top_p=0.92,  # Slightly higher for more diverse vocabulary
-                        repetition_penalty=1.15,  # Higher to avoid repetitive phrases
-                        pad_token_id=self.tokenizer.eos_token_id,
-                        eos_token_id=self.tokenizer.eos_token_id
-                    )
+                result = response.json()
+                ai_response = result["choices"][0]["message"]["content"].strip()
                 
-                # Decode only the new tokens
-                response = self.tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+                # Fallback if response is empty
+                if not ai_response or len(ai_response) < 5:
+                    return self.get_fallback_response(user_message)
                 
-            elif "TinyLlama" in self.model_name:
-                # TinyLlama format - build conversation with history
-                prompt = """<|system|>
-You are LeeBot, an empathetic emotional support companion from leeLab. Listen with compassion, validate feelings, and respond with warmth. Keep responses brief (2-3 sentences) and ask gentle questions to encourage dialogue. Never judge or minimize emotions.</s>
-"""
-                
-                # Add conversation history
-                for i in range(0, len(history), 2):
-                    if i < len(history):
-                        prompt += f"<|user|>\n{history[i]}</s>\n"
-                    if i + 1 < len(history):
-                        prompt += f"<|assistant|>\n{history[i + 1]}</s>\n"
-                
-                # Add current message
-                prompt += f"<|user|>\n{user_message}</s>\n<|assistant|>\n"
-                
-                logger.info(f"Prompt with history ({len(history)} messages): {prompt[:200]}...")
-                
-                inputs = self.tokenizer(prompt, return_tensors="pt", return_attention_mask=True)
-                
-                with torch.no_grad():
-                    outputs = self.model.generate(
-                        **inputs,
-                        max_new_tokens=80,  # Shorter for emotional support
-                        temperature=0.8,  # More natural warmth
-                        do_sample=True,
-                        top_p=0.92,
-                        repetition_penalty=1.15,
-                        pad_token_id=self.tokenizer.eos_token_id
-                    )
-                
-                response = self.tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
-                
-            else:
-                # DialoGPT format
-                encoded_input = self.tokenizer.encode(user_message + self.tokenizer.eos_token, return_tensors='pt')
-                
-                with torch.no_grad():
-                    output = self.model.generate(
-                        encoded_input,
-                        max_new_tokens=100,
-                        temperature=0.7,
-                        do_sample=True,
-                        top_p=0.9,
-                        repetition_penalty=1.1,
-                        pad_token_id=self.tokenizer.eos_token_id
-                    )
-                
-                response = self.tokenizer.decode(output[:, encoded_input.shape[-1]:][0], skip_special_tokens=True)
-
-            # Fallback if response is empty or too short
-            if not response or len(response.strip()) < 5:
-                response = self.get_fallback_response(user_message)
-
-            return response.strip()
+                return ai_response
 
         except Exception as e:
             logger.error(f"Error generating response: {e}")
@@ -382,15 +281,28 @@ You are LeeBot, an empathetic emotional support companion from leeLab. Listen wi
         except:
             return False
 
-    async def text_to_speech(self, text: str) -> Optional[str]:
-        """Convert text to speech using Kokoro TTS"""
+    async def text_to_speech(self, text: str, language: str = 'en') -> Optional[str]:
+        """Convert text to speech using Kokoro TTS with language preference"""
         try:
-            logger.info(f"Converting text to speech: {text[:50]}...")
+            logger.info(f"Converting text to speech: {text[:50]}... (language: {language})")
+            
+            # Map language codes to Kokoro language codes for TTS API
+            lang_mapping = {
+                'en': 'a',      # English
+                'fa': 'fa',     # Persian
+                'nan': 'nan',   # Hokkien
+                'yo': 'a'       # Yoruba (fallback to English voice for now)
+            }
+            kokoro_lang = lang_mapping.get(language, 'a')
             
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     self.tts_url,
-                    json={"text": text, "voice": "af_bella"}
+                    json={
+                        "text": text,
+                        "language": kokoro_lang,  # Send language instead of voice
+                        "auto_detect_language": False  # Disable auto-detection
+                    }
                 )
                 
                 if response.status_code != 200:
