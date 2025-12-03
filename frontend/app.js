@@ -24,6 +24,7 @@ function setLanguage(lang) {
         
         // Reload avatar if language changed (different avatar models for different languages)
         if (oldLang !== lang) {
+            window.avatarInstance.updateSceneBackground();
             window.avatarInstance.reloadAvatar();
         }
     }
@@ -53,6 +54,16 @@ class AvatarAssistant {
         this.visemeStartTime = 0;
         this.currentResponseText = '';
         
+        // Idle animation timers
+        this.nextBlinkTime = 5; // First blink after 5 seconds
+        this.blinkStartTime = 0;
+        this.blinkDuration = 0;
+        this.isBlinking = false;
+        this.nextLookTime = 0;
+        this.lookDuration = 0;
+        this.lookTarget = { x: 0, y: 0 };
+        this.currentLook = { x: 0, y: 0 };
+        
         this.init();
         this.setupChat();
         this.setupAudioContext();
@@ -62,32 +73,61 @@ class AvatarAssistant {
         return translations[this.currentLang][key] || translations['en'][key];
     }
 
+    updateSceneBackground() {
+        if (this.scene) {
+            // Dark purple-blue background for all languages
+            this.scene.background = new THREE.Color(0x1a1a2e);
+        }
+    }
+
     init() {
         const container = document.getElementById('avatar-container');
         
         // Scene setup
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x1a1a2e); // Dark purple-blue
+        this.updateSceneBackground(); // Set background based on language
 
         // Camera setup - Closer for headshot view
         this.camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
         this.camera.position.set(0, 1.65, 0.5); // Much closer - headshot distance
 
-        // Renderer setup
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        // Renderer setup with maximum quality
+        this.renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance"
+        });
         this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Sharp on retina displays
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.0;
         container.appendChild(this.renderer.domElement);
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        // Balanced Lighting Setup
+        // 1. Ambient light - soft overall illumination
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
         this.scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(1, 1, 1);
-        directionalLight.castShadow = true;
-        this.scene.add(directionalLight);
+        // 2. Key light (main directional light) - from front-right
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        keyLight.position.set(2, 3, 3);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        this.scene.add(keyLight);
+
+        // 3. Fill light - soft light from left
+        const fillLight = new THREE.DirectionalLight(0xd4e4ff, 0.3);
+        fillLight.position.set(-2, 2, 2);
+        this.scene.add(fillLight);
+
+        // 4. Rim/Back light - subtle edge lighting
+        const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        rimLight.position.set(0, 2, -3);
+        this.scene.add(rimLight);
 
         // Load avatar
         this.loadAvatar();
@@ -105,11 +145,16 @@ class AvatarAssistant {
             'en': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb',
             'fa': 'https://models.readyplayer.me/691df9fa1aa3af821a157927.glb',
             'nan': 'https://models.readyplayer.me/691dfb04fb99478e41171cd4.glb',
-            'yo': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb' // Default English avatar
+            'yo': 'https://models.readyplayer.me/69273d8a132e61458cd9f86e.glb'
         };
         
         const baseUrl = avatarMapping[this.currentLang] || avatarMapping['en'];
-        return `${baseUrl}?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none`;
+        // Highest quality settings:
+        // - morphTargets: ARKit + Oculus Visemes for lip sync
+        // - lod=0: Highest geometry detail
+        // - textureAtlas=none: Separate high-res textures
+        // - quality=high: Maximum texture resolution
+        return `${baseUrl}?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none&quality=high`;
     }
 
     loadAvatar() {
@@ -269,39 +314,36 @@ class AvatarAssistant {
         requestAnimationFrame(() => this.animate());
 
         const delta = this.clock.getDelta();
+        const time = this.clock.getElapsedTime();
         
         // Update animations
         if (this.mixer) {
             this.mixer.update(delta);
         }
 
-        // Continuous human-like movements (both idle and speaking)
+        // Natural idle animations
         if (this.avatar && !this.isLoading) {
-            const time = this.clock.getElapsedTime();
+            // Subtle breathing (chest movement)
+            const breathCycle = Math.sin(time * 0.5) * 0.004; // Slow, subtle breathing
+            this.avatar.position.y = breathCycle;
             
-            // Breathing animation (always active)
-            this.avatar.position.y = Math.sin(time * 1.8) * 0.008; // Slightly slower, more subtle
-            
-            // Natural head movements (always active)
-            if (this.avatar.children[0]) {
-                // Gentle head sway
-                this.avatar.children[0].rotation.y = Math.sin(time * 0.4) * 0.04;
+            // Gentle head movements (only when not speaking)
+            if (this.avatar.children[0] && !this.isSpeaking) {
+                // Very subtle head sway
+                this.avatar.children[0].rotation.y = Math.sin(time * 0.3) * 0.02;
                 
-                // Slight head tilt variation
-                this.avatar.children[0].rotation.z = Math.sin(time * 0.3) * 0.02;
+                // Tiny head tilt
+                this.avatar.children[0].rotation.z = Math.sin(time * 0.25) * 0.01;
                 
-                // Very subtle head nod
-                this.avatar.children[0].rotation.x = Math.sin(time * 0.6) * 0.015;
-                
-                // Additional speaking gestures when talking
-                if (this.isSpeaking) {
-                    // Slight forward lean when speaking
-                    this.avatar.children[0].rotation.x += Math.sin(time * 2.5) * 0.01;
-                    
-                    // More expressive head movement during speech
-                    this.avatar.children[0].rotation.y += Math.sin(time * 1.2) * 0.02;
-                }
+                // Micro head nod
+                this.avatar.children[0].rotation.x = Math.sin(time * 0.4) * 0.008;
             }
+            
+            // Eye blinking using morph targets
+            this.updateBlink(time);
+            
+            // Occasional eye/head look around
+            this.updateLookAround(time, delta);
         }
         
         // Update lip sync if speaking
@@ -490,7 +532,7 @@ class AvatarAssistant {
     }
 
     updateAudioDrivenLipSync() {
-        // Real-time audio-driven lip sync for Persian and Hokkien
+        // Real-time audio-driven lip sync for Persian, Hokkien, and Yoruba
         if (!this.audioAnalyser || !this.morphTargets) return;
 
         const influences = this.morphTargets.morphTargetInfluences;
@@ -509,7 +551,7 @@ class AvatarAssistant {
             sum += dataArray[i] * dataArray[i];
         }
         const volume = Math.sqrt(sum / bufferLength) / 255;
-        const isSpeaking = volume > 0.01;  // Lower threshold for Persian/Hokkien sensitivity
+        const isSpeaking = volume > 0.01;  // Lower threshold for Persian/Hokkien/Yoruba sensitivity
 
         if (isSpeaking) {
             // Get all viseme indices
@@ -626,6 +668,67 @@ class AvatarAssistant {
             console.warn('⚠️ No jaw bone found for fallback animation. Lip sync disabled.');
             console.log('Tip: Use a Ready Player Me avatar with morph targets for proper lip sync.');
             this.jawWarningLogged = true;
+        }
+    }
+
+    updateBlink(time) {
+        // Natural blinking animation using eye morph targets
+        if (!this.morphTargets || !this.morphTargets.morphTargetInfluences) return;
+        
+        // Random blink timing (every 5-8 seconds)
+        if (time > this.nextBlinkTime && !this.isBlinking) {
+            this.isBlinking = true;
+            this.blinkStartTime = time; // Record when blink started
+            this.blinkDuration = 0.15; // 150ms blink
+            this.nextBlinkTime = time + 5 + Math.random() * 3; // Next blink in 5-8 seconds
+        }
+        
+        // Animate blink
+        if (this.isBlinking) {
+            const blinkProgress = time - this.blinkStartTime;
+            const blinkPhase = Math.min(blinkProgress / this.blinkDuration, 1.0);
+            
+            // Smooth blink curve (close and open)
+            const blinkValue = Math.sin(blinkPhase * Math.PI);
+            
+            // Find eye blink morph targets
+            const eyeBlinkLeft = this.findMorphTarget(['eyeBlinkLeft', 'eye_blink_left', 'Blink_Left']);
+            const eyeBlinkRight = this.findMorphTarget(['eyeBlinkRight', 'eye_blink_right', 'Blink_Right']);
+            
+            if (eyeBlinkLeft >= 0) {
+                this.morphTargets.morphTargetInfluences[eyeBlinkLeft] = blinkValue;
+            }
+            if (eyeBlinkRight >= 0) {
+                this.morphTargets.morphTargetInfluences[eyeBlinkRight] = blinkValue;
+            }
+            
+            // End blink
+            if (blinkPhase >= 1.0) {
+                this.isBlinking = false;
+            }
+        }
+    }
+
+    updateLookAround(time, delta) {
+        // Subtle eye/head movement to simulate looking around
+        if (!this.avatar || !this.avatar.children[0]) return;
+        
+        // Update look target occasionally (every 3-8 seconds)
+        if (time > this.nextLookTime) {
+            this.lookTarget.x = (Math.random() - 0.5) * 0.03; // Small random look left/right
+            this.lookTarget.y = (Math.random() - 0.5) * 0.02; // Small random look up/down
+            this.nextLookTime = time + 3 + Math.random() * 5;
+        }
+        
+        // Smooth interpolation to look target
+        const lookSpeed = 0.5 * delta;
+        this.currentLook.x += (this.lookTarget.x - this.currentLook.x) * lookSpeed;
+        this.currentLook.y += (this.lookTarget.y - this.currentLook.y) * lookSpeed;
+        
+        // Apply subtle eye direction changes to head rotation (only when not speaking)
+        if (!this.isSpeaking) {
+            this.avatar.children[0].rotation.y += this.currentLook.x;
+            this.avatar.children[0].rotation.x += this.currentLook.y;
         }
     }
 
@@ -786,7 +889,7 @@ class AvatarAssistant {
         container.classList.add('speaking');
         this.updateStatus(this.t('statusSpeaking'));
         
-        // Use text-based lip sync only for English, audio-driven for Persian/Hokkien
+        // Use text-based lip sync only for English, audio-driven for Persian/Hokkien/Yoruba
         const useTextLipSync = this.currentLang === 'en' && this.currentResponseText && this.lipsyncEngine;
         
         console.log(`🎙️ Language: ${this.currentLang} | Text-based lip sync: ${useTextLipSync ? 'YES' : 'NO (using audio-driven)'}`);

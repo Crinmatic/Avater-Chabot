@@ -152,7 +152,7 @@ class AIAssistantServer:
                 'en': 'English',
                 'fa': 'Persian (فارسی)',
                 'nan': 'Taiwanese Hokkien (台語)',
-                'yo': 'Yoruba'
+                'yo': 'Yoruba (Yorùbá)'
             }
             target_lang = lang_names.get(preferred_lang, 'English')
             
@@ -169,7 +169,10 @@ Language Rules:
 - If preferred_lang is 'nan' → Respond ONLY in Taiwanese Hokkien (台語), NOT Mandarin Chinese
   * Use Hokkien vocabulary: 啥物 (not 什麼), 咱 (not 我們), 按怎 (not 怎麼), 會當 (not 可以)
   * Use colloquial Hokkien expressions and grammar patterns
-- If preferred_lang is 'yo' → Respond ONLY in Yoruba
+- If preferred_lang is 'yo' → Respond ONLY in Yoruba (Yorùbá)
+  * Use authentic Yoruba vocabulary and tonal markings
+  * Use common Yoruba expressions like: báwo ni, ẹ káàsán, o dára, mo fẹ́ràn
+  * Maintain respectful and warm tone typical in Yoruba communication
 
 PERSONA: Empathetic, warm, friendly student support assistant
 
@@ -235,9 +238,14 @@ Keep responses brief (2-4 sentences). STRICTLY use {target_lang} only."""}
         # Emotional support fallbacks
         fallbacks = {
             # Greetings - warm and welcoming
-            'hello': "Hello! I'm LeeBot from leeLab. I'm here to listen and support you. How are you feeling today?",
+            'hello': "Hello! I'm AvatarConnect from leeLab. I'm here to listen and support you. How are you feeling today?",
             'hi': "Hi there! I'm glad you're here. What's on your mind?",
             'hey': "Hey! I'm here for you. Would you like to talk about something?",
+            
+            # Yoruba greetings
+            'bawo': "Báwo ni! Mo jẹ́ AvatarConnect láti leeLab. Mo wà níbí láti gbọ́ ọ̀rọ̀ rẹ. Báwo ni ìmọ̀lára rẹ?",
+            'ẹ káàsán': "Ẹ káàsán! Mo dúpẹ́ pé o wà níbí. Kí ní ń ṣe ọ́ lọ́kàn?",
+            'pẹlẹ': "Pẹ́lẹ́! Mo wà níbí fún ọ. Ṣé o fẹ́ sọ̀rọ̀ nípa nǹkan kan?",
             
             # Emotional states - validation and empathy
             'sad': "I hear that you're feeling sad. That must be really difficult. Would you like to share what's weighing on you?",
@@ -291,7 +299,7 @@ Keep responses brief (2-4 sentences). STRICTLY use {target_lang} only."""}
                 'en': 'a',      # English
                 'fa': 'fa',     # Persian
                 'nan': 'nan',   # Hokkien
-                'yo': 'a'       # Yoruba (fallback to English voice for now)
+                'yo': 'yo'      # Yoruba
             }
             kokoro_lang = lang_mapping.get(language, 'a')
             
