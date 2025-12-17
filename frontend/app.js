@@ -323,20 +323,13 @@ class AvatarAssistant {
 
         // Natural idle animations
         if (this.avatar && !this.isLoading) {
-            // Subtle breathing (chest movement)
-            const breathCycle = Math.sin(time * 0.5) * 0.004; // Slow, subtle breathing
-            this.avatar.position.y = breathCycle;
-            
             // Gentle head movements (only when not speaking)
             if (this.avatar.children[0] && !this.isSpeaking) {
-                // Very subtle head sway
+                // Very subtle head sway (side to side - Y rotation)
                 this.avatar.children[0].rotation.y = Math.sin(time * 0.3) * 0.02;
                 
-                // Tiny head tilt
+                // Tiny head tilt (Z rotation)
                 this.avatar.children[0].rotation.z = Math.sin(time * 0.25) * 0.01;
-                
-                // Micro head nod
-                this.avatar.children[0].rotation.x = Math.sin(time * 0.4) * 0.008;
             }
             
             // Eye blinking using morph targets
@@ -726,9 +719,10 @@ class AvatarAssistant {
         this.currentLook.y += (this.lookTarget.y - this.currentLook.y) * lookSpeed;
         
         // Apply subtle eye direction changes to head rotation (only when not speaking)
+        // Only side-to-side, no up/down
         if (!this.isSpeaking) {
             this.avatar.children[0].rotation.y += this.currentLook.x;
-            this.avatar.children[0].rotation.x += this.currentLook.y;
+            // rotation.x removed - no vertical head movement
         }
     }
 
