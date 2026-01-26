@@ -1,8 +1,8 @@
 const translations = {
-    en: { statusInit: "Initializing AvatarConnect...", welcomeMessage: "Hello! I'm AvatarConnect, your emotional support companion from leeLab. I'm here to listen and support you. How are you feeling today?", placeholder: "Share what's on your mind...", sendBtn: "Send", sidebarTitle: "AI Avatar Assistant", newChat: "New Chat", settings: "Settings", historyTitle: "Chats", theme: "Theme:", voice: "Avatar Voice:", language: "Menu Language:", save: "Save", statusListening: "Listening...", statusThinking: "Thinking...", statusSpeaking: "Speaking...", statusLoading: "Loading avatar...", errorMsg: "Sorry, I encountered an error. Please try again." },
-    fa: { statusInit: "در حال راه‌اندازی لی‌بات...", welcomeMessage: "سلام! من لی‌بات هستم. امروز چه احساسی دارید؟", placeholder: "آنچه در ذهن دارید را به اشتراک بگذارید...", sendBtn: "ارسال", sidebarTitle: "دستیار آواتار هوشمند", newChat: "چت جدید", settings: "تنظیمات", historyTitle: "تاریخچه", theme: "تم:", voice: "صدای آواتار:", language: "زبان منو:", save: "ذخیره", statusListening: "در حال گوش دادن...", statusThinking: "در حال فکر کردن...", statusSpeaking: "در حال صحبت...", statusLoading: "در حال بارگذاری آواتار...", errorMsg: "متاسفم، مشکلی پیش آمد." },
-    yo: { statusInit: "O n bẹrẹ AvatarConnect...", welcomeMessage: "Kaabo! Emi ni AvatarConnect. Bawo ni o ṣe lero loni?", placeholder: "Pin ohun ti o wa ni ọkan rẹ...", sendBtn: "Fi ranṣẹ", sidebarTitle: "Oluranlọwọ Avatar AI", newChat: "Ifọrọwerọ Tuntun", settings: "Ètò", historyTitle: "Awọn iwiregbe", theme: "Àwọ̀:", voice: "Ohùn Avatar:", language: "Ede Akojọ:", save: "Fipamọ", statusListening: "N tẹtisi...", statusThinking: "N ronu...", statusSpeaking: "N sọrọ...", statusLoading: "N kojọpọ avatar...", errorMsg: "Ma binu, mo ni aṣiṣe kan." },
-    nan: { statusInit: "AvatarConnect 啟動中...", welcomeMessage: "你好! 我是 AvatarConnect。你今天感覺如何？", placeholder: "分享你在想什麼...", sendBtn: "送出", sidebarTitle: "AI 虛擬助手", newChat: "新開講", settings: "設定", historyTitle: "歷史", theme: "主題:", voice: "聲音:", language: "選單語言:", save: "儲存", statusListening: "聽你在說...", statusThinking: "想看覓...", statusSpeaking: "講話中...", statusLoading: "Avatar 載入中...", errorMsg: "歹勢，出了一點問題。" }
+    en: { statusInit: "Initializing AvatarConnect...", welcomeMessage: "Hello! I'm AvatarConnect, your emotional support companion from leeLab. I'm here to listen and support you. How are you feeling today?", placeholder: "Share what's on your mind...", sendBtn: "Send", sidebarTitle: "AI Avatar Assistant", newChat: "New Chat", settings: "Settings", historyTitle: "History", theme: "Theme:", voice: "Avatar Voice:", language: "Menu Language:", save: "Save", statusListening: "Listening...", statusThinking: "Thinking...", statusSpeaking: "Speaking...", statusLoading: "Loading avatar...", errorMsg: "Sorry, I encountered an error. Please try again.", loginTitle: "Welcome", loginPlaceholder: "Enter your username", loginBtn: "Start Chatting", logout: "Logout" },
+    fa: { statusInit: "در حال راه‌اندازی لی‌بات...", welcomeMessage: "سلام! من لی‌بات هستم. امروز چه احساسی دارید؟", placeholder: "آنچه در ذهن دارید را به اشتراک بگذارید...", sendBtn: "ارسال", sidebarTitle: "دستیار آواتار هوشمند", newChat: "چت جدید", settings: "تنظیمات", historyTitle: "تاریخچه", theme: "تم:", voice: "صدای آواتار:", language: "زبان منو:", save: "ذخیره", statusListening: "در حال گوش دادن...", statusThinking: "در حال فکر کردن...", statusSpeaking: "در حال صحبت...", statusLoading: "در حال بارگذاری آواتار...", errorMsg: "متاسفم، مشکلی پیش آمد.", loginTitle: "خوش آمدید", loginPlaceholder: "نام کاربری خود را وارد کنید", loginBtn: "شروع گفتگو", logout: "خروج" },
+    yo: { statusInit: "O n bẹrẹ AvatarConnect...", welcomeMessage: "Kaabo! Emi ni AvatarConnect. Bawo ni o ṣe lero loni?", placeholder: "Pin ohun ti o wa ni ọkan rẹ...", sendBtn: "Fi ranṣẹ", sidebarTitle: "Oluranlọwọ Avatar AI", newChat: "Ifọrọwerọ Tuntun", settings: "Ètò", historyTitle: "Itan", theme: "Àwọ̀:", voice: "Ohùn Avatar:", language: "Ede Akojọ:", save: "Fipamọ", statusListening: "N tẹtisi...", statusThinking: "N ronu...", statusSpeaking: "N sọrọ...", statusLoading: "N kojọpọ avatar...", errorMsg: "Ma binu, mo ni aṣiṣe kan.", loginTitle: "Kaabo", loginPlaceholder: "Tẹ orukọ olumulo rẹ sii", loginBtn: "Bẹrẹ Ifọrọwerọ", logout: "Jade" },
+    nan: { statusInit: "AvatarConnect 啟動中...", welcomeMessage: "你好! 我是 AvatarConnect。你今天感覺如何？", placeholder: "分享你在想什麼...", sendBtn: "送出", sidebarTitle: "AI 虛擬助手", newChat: "新開講", settings: "設定", historyTitle: "歷史", theme: "主題:", voice: "聲音:", language: "選單語言:", save: "儲存", statusListening: "聽你在說...", statusThinking: "想看覓...", statusSpeaking: "講話中...", statusLoading: "Avatar 載入中...", errorMsg: "歹勢，出了一點問題。", loginTitle: "歡迎", loginPlaceholder: "輸入你的使用者名稱", loginBtn: "開始講話", logout: "登出" }
 };
 
 function setLanguage(lang) {
@@ -16,12 +16,12 @@ function setLanguage(lang) {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         el.placeholder = translations[lang][el.getAttribute('data-i18n-placeholder')];
     });
-    
+
     // Update dynamic instance strings and reload avatar if language changed
     if (window.avatarInstance) {
         const oldLang = window.avatarInstance.currentLang;
         window.avatarInstance.currentLang = lang;
-        
+
         // Reload avatar if language changed (different avatar models for different languages)
         if (oldLang !== lang) {
             window.avatarInstance.updateSceneBackground();
@@ -45,15 +45,21 @@ class AvatarAssistant {
         this.currentAudio = null;
         this.morphTargets = null;
         this.sessionId = null; // Track session ID for conversation memory
+        this.sessionId = null; // Track session ID for conversation memory
         this.currentLang = 'en'; // Default Menu Language
-        
+        this.username = localStorage.getItem('avatar_username'); // Check if logged in
+
+        // --- NEW: Login & History Management Setup ---
+        this.setupLogin();
+        // ---------------------------------------------
+
         // Text-to-viseme lip sync system
         this.lipsyncEngine = new LipsyncEn();
         this.visemeQueue = [];
         this.currentVisemeIndex = 0;
         this.visemeStartTime = 0;
         this.currentResponseText = '';
-        
+
         // Idle animation timers
         this.nextBlinkTime = 5; // First blink after 5 seconds
         this.blinkStartTime = 0;
@@ -63,7 +69,7 @@ class AvatarAssistant {
         this.lookDuration = 0;
         this.lookTarget = { x: 0, y: 0 };
         this.currentLook = { x: 0, y: 0 };
-        
+
         this.init();
         this.setupChat();
         this.setupAudioContext();
@@ -82,7 +88,7 @@ class AvatarAssistant {
 
     init() {
         const container = document.getElementById('avatar-container');
-        
+
         // Scene setup
         this.scene = new THREE.Scene();
         this.updateSceneBackground(); // Set background based on language
@@ -92,7 +98,7 @@ class AvatarAssistant {
         this.camera.position.set(0, 1.65, 0.5); // Much closer - headshot distance
 
         // Renderer setup with maximum quality
-        this.renderer = new THREE.WebGLRenderer({ 
+        this.renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: true,
             powerPreference: "high-performance"
@@ -134,20 +140,110 @@ class AvatarAssistant {
 
         // Handle window resize
         window.addEventListener('resize', () => this.onWindowResize());
-        
+
         // Start render loop
         this.animate();
     }
 
+    setupLogin() {
+        const modal = document.getElementById('loginModal');
+        const usernameInput = document.getElementById('loginUsername');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginTitle = document.getElementById('loginTitle');
+
+        // Check for existing login
+        if (this.username) {
+            modal.style.display = 'none';
+            this.loadHistory();
+            this.updateStatus(this.t('statusInit'));
+        } else {
+            modal.style.display = 'flex';
+        }
+
+        loginBtn.addEventListener('click', async () => {
+            const username = usernameInput.value.trim();
+            if (username) {
+                this.username = username;
+                localStorage.setItem('avatar_username', username);
+                modal.style.display = 'none';
+
+                // Register user in backend
+                try {
+                    await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username })
+                    });
+                } catch (e) {
+                    console.error("Login sync failed:", e);
+                }
+
+                this.loadHistory();
+                this.updateStatus(this.t('statusInit'));
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('avatar_username');
+            location.reload();
+        });
+    }
+
+    async loadHistory() {
+        if (!this.username) return;
+
+        try {
+            const response = await fetch(`/api/sessions?username=${this.username}`);
+            const sessions = await response.json();
+
+            const chatList = document.querySelector('.chat-list');
+            chatList.innerHTML = ''; // Clear existing
+
+            sessions.forEach(session => {
+                const li = document.createElement('li');
+                li.textContent = session.title || new Date(session.created_at).toLocaleString();
+                li.onclick = () => this.loadSession(session.id);
+                chatList.appendChild(li);
+            });
+
+        } catch (e) {
+            console.error("Failed to load history:", e);
+        }
+    }
+
+    async loadSession(sessionId) {
+        this.sessionId = sessionId;
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = ''; // Clear current chat
+
+        try {
+            const response = await fetch(`/api/sessions/${sessionId}`);
+            const data = await response.json();
+
+            data.messages.forEach(msg => {
+                this.addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
+            });
+
+            // Close sidebar on mobile
+            document.getElementById('sidebar').classList.remove('open');
+
+        } catch (e) {
+            console.error("Failed to load session:", e);
+        }
+    }
+
     getAvatarUrl() {
         // Avatar mapping based on selected language
+        // Avatar mapping with high-quality presets for each language
+        // All avatars use Ready Player Me modular characters
         const avatarMapping = {
-            'en': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb',
-            'fa': 'https://models.readyplayer.me/691df9fa1aa3af821a157927.glb',
-            'nan': 'https://models.readyplayer.me/691dfb04fb99478e41171cd4.glb',
-            'yo': 'https://models.readyplayer.me/69273d8a132e61458cd9f86e.glb'
+            'en': 'https://models.readyplayer.me/64b73b52627443194511ee40.glb', // Neutral professional
+            'fa': 'https://models.readyplayer.me/64b73bd5853b0e3532386400.glb', // Middle eastern inspired
+            'nan': 'https://models.readyplayer.me/64b73c49627443194511ef5e.glb', // East asian inspired
+            'yo': 'https://models.readyplayer.me/64b73ca7853b0e3532386566.glb'  // African inspired
         };
-        
+
         const baseUrl = avatarMapping[this.currentLang] || avatarMapping['en'];
         // Highest quality settings:
         // - morphTargets: ARKit + Oculus Visemes for lip sync
@@ -159,31 +255,31 @@ class AvatarAssistant {
 
     loadAvatar() {
         const loader = new THREE.GLTFLoader();
-        
+
         // Ready Player Me API - Request avatar with morph targets
         // Documentation: https://docs.readyplayer.me/ready-player-me/api-reference/rest-api/avatars/get-3d-avatars
         // Options: "ARKit", "Oculus Visemes", or both "ARKit,Oculus Visemes"
-        
+
         // Using ARKit which includes: jawOpen, mouthOpen, mouthSmile, etc.
         // AND Oculus Visemes for better lip sync
         const avatarUrl = this.getAvatarUrl();
-        
+
         console.log('🔄 Loading avatar with morph targets from:', avatarUrl);
         this.updateStatus(this.t('statusLoading'));
-        
+
         loader.load(
             avatarUrl,
             (gltf) => {
                 this.avatar = gltf.scene;
                 this.avatar.scale.set(1, 1, 1);
                 this.avatar.position.set(0, 0, 0);
-                
+
                 // Enable shadows
                 this.avatar.traverse((child) => {
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
-                        
+
                         // Find the HEAD mesh with morph targets for lip sync
                         // Ready Player Me avatars use Wolf3D_Head or Wolf3D_Avatar for facial animation
                         if (child.morphTargetInfluences && child.morphTargetInfluences.length > 0) {
@@ -193,7 +289,7 @@ class AvatarAssistant {
                                 console.log('✅ Found LIP SYNC mesh:', child.name);
                                 console.log('Morph target dictionary:', child.morphTargetDictionary);
                                 console.log('Total morph targets:', child.morphTargetInfluences.length);
-                                
+
                                 // Check for Ready Player Me blend shapes (both ARKit and Oculus)
                                 console.log('--- Checking for Lip Sync Blend Shapes ---');
                                 const blendShapeChecks = {
@@ -212,7 +308,7 @@ class AvatarAssistant {
                                     'viseme_PP': this.findMorphTarget(['viseme_PP']),
                                     'viseme_SS': this.findMorphTarget(['viseme_SS'])
                                 };
-                                
+
                                 let foundCount = 0;
                                 Object.keys(blendShapeChecks).forEach(key => {
                                     const found = blendShapeChecks[key] !== -1;
@@ -225,14 +321,14 @@ class AvatarAssistant {
                         }
                     }
                 });
-                
+
                 // Debug: Log all avatar children for troubleshooting
                 console.log('--- Avatar Structure Debug ---');
                 console.log('Avatar children count:', this.avatar.children.length);
                 this.avatar.traverse((child) => {
                     if (child.name) {
-                        console.log('- ' + child.name, 
-                            child.type, 
+                        console.log('- ' + child.name,
+                            child.type,
                             child.morphTargetInfluences ? `(${child.morphTargetInfluences.length} morphs)` : '');
                     }
                 });
@@ -246,7 +342,7 @@ class AvatarAssistant {
 
                 this.scene.add(this.avatar);
                 this.isLoading = false;
-                
+
                 // Check if we found morph targets for lip sync
                 if (this.morphTargets) {
                     this.updateStatus('Avatar loaded! Lip sync: ✅ ENABLED');
@@ -256,7 +352,7 @@ class AvatarAssistant {
                     console.warn('⚠️ No morph targets found - using fallback jaw animation');
                     console.log('This avatar may not support lip sync. Consider using a newer Ready Player Me avatar.');
                 }
-                
+
                 this.enableChat();
             },
             (progress) => {
@@ -278,7 +374,7 @@ class AvatarAssistant {
         }
         this.isSpeaking = false;
         this.visemeQueue = [];
-        
+
         // Remove old avatar from scene completely
         if (this.avatar) {
             // Dispose of all materials and geometries
@@ -298,13 +394,13 @@ class AvatarAssistant {
             this.avatar = null;
             this.morphTargets = null;
         }
-        
+
         // Reset mixer if exists
         if (this.mixer) {
             this.mixer.stopAllAction();
             this.mixer = null;
         }
-        
+
         // Load new avatar with updated language
         this.isLoading = true;
         this.loadAvatar();
@@ -315,7 +411,7 @@ class AvatarAssistant {
 
         const delta = this.clock.getDelta();
         const time = this.clock.getElapsedTime();
-        
+
         // Update animations
         if (this.mixer) {
             this.mixer.update(delta);
@@ -327,18 +423,18 @@ class AvatarAssistant {
             if (this.avatar.children[0] && !this.isSpeaking) {
                 // Very subtle head sway (side to side - Y rotation)
                 this.avatar.children[0].rotation.y = Math.sin(time * 0.3) * 0.02;
-                
+
                 // Tiny head tilt (Z rotation)
                 this.avatar.children[0].rotation.z = Math.sin(time * 0.25) * 0.01;
             }
-            
+
             // Eye blinking using morph targets
             this.updateBlink(time);
-            
+
             // Occasional eye/head look around
             this.updateLookAround(time, delta);
         }
-        
+
         // Update lip sync if speaking
         if (this.isSpeaking && this.audioAnalyser) {
             if (this.morphTargets) {
@@ -373,28 +469,28 @@ class AvatarAssistant {
         // Create audio context for lip sync analysis
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.audioAnalyser = this.audioContext.createAnalyser();
-        
+
         // Higher FFT size for better frequency resolution (more detailed phoneme detection)
         this.audioAnalyser.fftSize = 1024; // Increased from 512 for finer detail
-        
+
         // Less smoothing for more responsive lip sync (was 0.7)
         this.audioAnalyser.smoothingTimeConstant = 0.6;
-        
-        console.log('🎤 Audio analyzer configured: FFT size =', this.audioAnalyser.fftSize, 
-                   'Frequency bins =', this.audioAnalyser.frequencyBinCount);
+
+        console.log('🎤 Audio analyzer configured: FFT size =', this.audioAnalyser.fftSize,
+            'Frequency bins =', this.audioAnalyser.frequencyBinCount);
     }
 
     updateLipSync() {
         if (!this.morphTargets) {
             return;
         }
-        
+
         // Audio-driven lip sync for non-English languages (or when no viseme queue)
         if (this.visemeQueue.length === 0 && this.isSpeaking) {
             this.updateAudioDrivenLipSync();
             return;
         }
-        
+
         // Text-based lip sync (English only)
         if (this.visemeQueue.length === 0) {
             return;
@@ -406,22 +502,22 @@ class AvatarAssistant {
         // REAL-TIME AUDIO ANALYSIS - Detect actual speech vs silence
         let audioVolume = 0;
         let isActuallySpeaking = false;
-        
+
         if (this.audioAnalyser) {
             const bufferLength = this.audioAnalyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
             this.audioAnalyser.getByteFrequencyData(dataArray);
-            
+
             // Calculate RMS volume for speech detection
             let sum = 0;
             for (let i = 0; i < bufferLength; i++) {
                 sum += dataArray[i] * dataArray[i];
             }
             audioVolume = Math.sqrt(sum / bufferLength) / 255;
-            
+
             // Speech threshold - only animate when actually speaking
             isActuallySpeaking = audioVolume > 0.02; // Adjust threshold as needed
-            
+
             // Debug logging (throttled)
             if (!this.lastAudioLog || Date.now() - this.lastAudioLog > 500) {
                 console.log(`🎵 Audio: ${(audioVolume * 100).toFixed(1)}% | Speaking: ${isActuallySpeaking ? '✅' : '❌'}`);
@@ -431,13 +527,13 @@ class AvatarAssistant {
 
         // TalkingHead-style coarticulation: Multiple visemes active simultaneously
         const activeVisemes = new Map();
-        
+
         for (const viseme of this.visemeQueue) {
             if (currentTime < viseme.attackTime) continue; // Not started yet
             if (currentTime > viseme.releaseTime) continue; // Already finished
-            
+
             let intensity = 0;
-            
+
             if (currentTime < viseme.peakTime) {
                 // Attack phase: blend in
                 const progress = (currentTime - viseme.attackTime) / (viseme.peakTime - viseme.attackTime);
@@ -447,25 +543,25 @@ class AvatarAssistant {
                 const progress = (currentTime - viseme.peakTime) / (viseme.releaseTime - viseme.peakTime);
                 intensity = 1.0 - this.easeInOut(progress);
             }
-            
+
             // Different max intensities for different viseme types (REDUCED for subtle movement)
             let maxIntensity = 0.35; // Reduced from 0.6 - much more subtle
             if (['PP', 'FF'].includes(viseme.name)) {
                 maxIntensity = 0.5; // Reduced from 0.9 - still visible but not exaggerated
             }
-            
+
             // Accumulate intensity (allows blending of multiple visemes)
             const current = activeVisemes.get(viseme.name) || 0;
             activeVisemes.set(viseme.name, Math.min(current + intensity * maxIntensity, 1.0));
         }
-        
+
         // Apply all active visemes with AUDIO-GATED blending
         const allVisemes = ['aa', 'E', 'I', 'O', 'U', 'PP', 'SS', 'TH', 'CH', 'FF', 'kk', 'nn', 'RR', 'DD', 'sil'];
-        
+
         for (const visemeName of allVisemes) {
             const index = this.findMorphTarget([`viseme_${visemeName}`]);
             if (index === -1) continue;
-            
+
             if (activeVisemes.has(visemeName) && isActuallySpeaking) {
                 // Active AND audio is present: set to calculated intensity
                 const targetIntensity = activeVisemes.get(visemeName) * (0.5 + audioVolume * 0.5);
@@ -476,7 +572,7 @@ class AvatarAssistant {
                 if (influences[index] < 0.01) influences[index] = 0;
             }
         }
-        
+
         // During silence, show neutral/rest position
         if (!isActuallySpeaking) {
             const silIndex = this.findMorphTarget(['viseme_sil']);
@@ -484,7 +580,7 @@ class AvatarAssistant {
                 influences[silIndex] = Math.min(influences[silIndex] + 0.1, 0.3);
             }
         }
-        
+
         // Jaw movement for vowels (AUDIO-GATED - only when actually speaking)
         let maxJaw = 0;
         if (isActuallySpeaking) {
@@ -494,7 +590,7 @@ class AvatarAssistant {
                 }
             }
         }
-        
+
         const jawIndex = this.findMorphTarget(['jawOpen']);
         if (jawIndex !== -1) {
             if (isActuallySpeaking) {
@@ -507,11 +603,11 @@ class AvatarAssistant {
             }
         }
     }
-    
+
     easeInOut(t) {
         // Sigmoid-like easing for smooth coarticulation (TalkingHead uses sigmoid(5))
-        return t < 0.5 
-            ? 2 * t * t 
+        return t < 0.5
+            ? 2 * t * t
             : 1 - Math.pow(-2 * t + 2, 2) / 2;
     }
 
@@ -592,7 +688,7 @@ class AvatarAssistant {
             const allVisemes = [aaIndex, oIndex, eIndex, iIndex, uIndex, ppIndex, ssIndex, thIndex];
             for (const idx of allVisemes) {
                 if (idx === -1) continue;
-                
+
                 if (idx === dominantViseme) {
                     // Reduce intensity by 60%
                     influences[idx] = this.smoothValue(influences[idx], dominantIntensity * 0.4, 0.2);
@@ -641,13 +737,13 @@ class AvatarAssistant {
         let jawAnimated = false;
         this.avatar.traverse((child) => {
             const name = child.name ? child.name.toLowerCase() : '';
-            
+
             // Only target specific jaw/mouth bones, not head or body
-            if (name === 'jaw' || 
-                name === 'jawbone' || 
+            if (name === 'jaw' ||
+                name === 'jawbone' ||
                 name === 'lower_jaw' ||
                 name === 'mandible') {
-                
+
                 // Rotate jaw bone based on volume
                 if (child.isObject3D) {
                     child.rotation.x = volume * 0.3; // Jaw open rotation
@@ -655,7 +751,7 @@ class AvatarAssistant {
                 }
             }
         });
-        
+
         // If no jaw bone found, log a warning once
         if (!jawAnimated && !this.jawWarningLogged) {
             console.warn('⚠️ No jaw bone found for fallback animation. Lip sync disabled.');
@@ -667,7 +763,7 @@ class AvatarAssistant {
     updateBlink(time) {
         // Natural blinking animation using eye morph targets
         if (!this.morphTargets || !this.morphTargets.morphTargetInfluences) return;
-        
+
         // Random blink timing (every 5-8 seconds)
         if (time > this.nextBlinkTime && !this.isBlinking) {
             this.isBlinking = true;
@@ -675,26 +771,26 @@ class AvatarAssistant {
             this.blinkDuration = 0.15; // 150ms blink
             this.nextBlinkTime = time + 5 + Math.random() * 3; // Next blink in 5-8 seconds
         }
-        
+
         // Animate blink
         if (this.isBlinking) {
             const blinkProgress = time - this.blinkStartTime;
             const blinkPhase = Math.min(blinkProgress / this.blinkDuration, 1.0);
-            
+
             // Smooth blink curve (close and open)
             const blinkValue = Math.sin(blinkPhase * Math.PI);
-            
+
             // Find eye blink morph targets
             const eyeBlinkLeft = this.findMorphTarget(['eyeBlinkLeft', 'eye_blink_left', 'Blink_Left']);
             const eyeBlinkRight = this.findMorphTarget(['eyeBlinkRight', 'eye_blink_right', 'Blink_Right']);
-            
+
             if (eyeBlinkLeft >= 0) {
                 this.morphTargets.morphTargetInfluences[eyeBlinkLeft] = blinkValue;
             }
             if (eyeBlinkRight >= 0) {
                 this.morphTargets.morphTargetInfluences[eyeBlinkRight] = blinkValue;
             }
-            
+
             // End blink
             if (blinkPhase >= 1.0) {
                 this.isBlinking = false;
@@ -705,19 +801,19 @@ class AvatarAssistant {
     updateLookAround(time, delta) {
         // Subtle eye/head movement to simulate looking around
         if (!this.avatar || !this.avatar.children[0]) return;
-        
+
         // Update look target occasionally (every 3-8 seconds)
         if (time > this.nextLookTime) {
             this.lookTarget.x = (Math.random() - 0.5) * 0.03; // Small random look left/right
             this.lookTarget.y = (Math.random() - 0.5) * 0.02; // Small random look up/down
             this.nextLookTime = time + 3 + Math.random() * 5;
         }
-        
+
         // Smooth interpolation to look target
         const lookSpeed = 0.5 * delta;
         this.currentLook.x += (this.lookTarget.x - this.currentLook.x) * lookSpeed;
         this.currentLook.y += (this.lookTarget.y - this.currentLook.y) * lookSpeed;
-        
+
         // Apply subtle eye direction changes to head rotation (only when not speaking)
         // Only side-to-side, no up/down
         if (!this.isSpeaking) {
@@ -728,7 +824,7 @@ class AvatarAssistant {
 
     findMorphTarget(names) {
         if (!this.morphTargets || !this.morphTargets.morphTargetDictionary) return -1;
-        
+
         for (const name of names) {
             if (this.morphTargets.morphTargetDictionary[name] !== undefined) {
                 return this.morphTargets.morphTargetDictionary[name];
@@ -760,7 +856,7 @@ class AvatarAssistant {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         message,
                         session_id: this.sessionId, // Send session ID to maintain conversation
                         preferred_language: this.currentLang // Send user's selected language
@@ -772,15 +868,15 @@ class AvatarAssistant {
                 }
 
                 const data = await response.json();
-                
+
                 // Store session ID from response for future messages
                 if (data.session_id) {
                     this.sessionId = data.session_id;
                 }
-                
+
                 // Add AI response to chat
                 this.addMessage(data.response, 'ai');
-                
+
                 // Play the speech with the response text for lip sync
                 if (data.audioUrl) {
                     await this.playAudio(data.audioUrl, data.response);
@@ -815,20 +911,20 @@ class AvatarAssistant {
     async playAudio(audioUrl, responseText) {
         return new Promise((resolve, reject) => {
             console.log('🎵 Playing audio:', audioUrl);
-            
+
             // Store the response text for lip sync
             this.currentResponseText = responseText || '';
-            
+
             // Create new audio element
             const audio = new Audio(audioUrl);
             this.currentAudio = audio;
-            
+
             // Resume audio context if suspended (browser autoplay policy)
             if (this.audioContext && this.audioContext.state === 'suspended') {
                 console.log('Resuming audio context...');
                 this.audioContext.resume();
             }
-            
+
             // Connect to Web Audio API for analysis (only if analyser exists)
             if (this.audioContext && this.audioAnalyser) {
                 try {
@@ -841,30 +937,30 @@ class AvatarAssistant {
                     // Continue playing audio even if analyser connection fails
                 }
             }
-            
+
             audio.onloadedmetadata = () => {
                 console.log('📊 Audio metadata loaded');
                 console.log('  Duration:', audio.duration.toFixed(2), 'seconds');
                 // Pass audio duration to startSpeaking for accurate timing
                 this.startSpeaking(audio.duration);
             };
-            
+
             audio.onplay = () => {
                 console.log('▶️ Audio playing');
             };
-            
+
             audio.onended = () => {
                 console.log('Audio ended');
                 this.stopSpeaking();
                 resolve();
             };
-            
+
             audio.onerror = (error) => {
                 console.error('❌ Audio error:', error);
                 this.stopSpeaking();
                 reject(error);
             };
-            
+
             // Attempt to play
             audio.play().then(() => {
                 console.log('✅ Audio playback started successfully');
@@ -882,35 +978,35 @@ class AvatarAssistant {
         const container = document.getElementById('avatar-container');
         container.classList.add('speaking');
         this.updateStatus(this.t('statusSpeaking'));
-        
+
         // Use text-based lip sync only for English, audio-driven for Persian/Hokkien/Yoruba
         const useTextLipSync = this.currentLang === 'en' && this.currentResponseText && this.lipsyncEngine;
-        
+
         console.log(`🎙️ Language: ${this.currentLang} | Text-based lip sync: ${useTextLipSync ? 'YES' : 'NO (using audio-driven)'}`);
-        
+
         // Convert text to viseme sequence using TalkingHead approach (English only)
         if (useTextLipSync) {
             const result = this.lipsyncEngine.wordsToVisemes(this.currentResponseText);
-            
+
             console.log('📝 Text-to-Viseme conversion (TalkingHead method):');
             console.log('  Visemes:', result.visemes.slice(0, 10).join(', ') + '...');
             console.log('  Total visemes:', result.visemes.length);
-            
+
             // Calculate total duration from viseme durations (in relative units)
             const totalRelativeDuration = result.durations.reduce((sum, d) => sum + d, 0);
-            const scaleFactor = audioDuration 
+            const scaleFactor = audioDuration
                 ? (audioDuration * 1000) / totalRelativeDuration  // Convert to ms and scale
                 : 100; // Fallback: 100ms per duration unit
-            
+
             // TalkingHead-style coarticulation: Overlapping viseme envelopes
             // Formula: [time - 2*duration/3, time, time + 1.5*duration]
             this.visemeQueue = [];
             let cumulativeTime = 0;
-            
+
             for (let i = 0; i < result.visemes.length; i++) {
                 const duration = result.durations[i] * scaleFactor;
                 const visemeCenter = cumulativeTime + duration / 2;
-                
+
                 // 3-point envelope for natural coarticulation
                 this.visemeQueue.push({
                     name: result.visemes[i],
@@ -919,18 +1015,18 @@ class AvatarAssistant {
                     releaseTime: visemeCenter + (duration * 1.5),    // Extend AFTER
                     duration: duration
                 });
-                
+
                 cumulativeTime += duration;
             }
-            
+
             this.speechStartTime = performance.now();
             console.log('⏱️ Timing:', audioDuration ? audioDuration.toFixed(2) + 's' : 'estimated');
             console.log('🎯 Coarticulation: ✅ ENABLED (overlapping visemes)');
-            console.log('  Example timing:', this.visemeQueue.slice(0, 2).map(v => 
+            console.log('  Example timing:', this.visemeQueue.slice(0, 2).map(v =>
                 `${v.name}[${v.attackTime.toFixed(0)}→${v.peakTime.toFixed(0)}→${v.releaseTime.toFixed(0)}]`
             ).join(' '));
         }
-        
+
         // Log lip sync status
         if (this.morphTargets) {
             if (useTextLipSync) {
@@ -948,25 +1044,25 @@ class AvatarAssistant {
         const container = document.getElementById('avatar-container');
         container.classList.remove('speaking');
         this.updateStatus(this.t('statusListening'));
-        
+
         // Clear viseme queue
         this.visemeQueue = [];
         this.currentVisemeIndex = 0;
         this.currentResponseText = '';
-        
+
         // Reset logging flags for next speech
         this.lipSyncLogged = false;
         this.morphTargetSetLogged = false;
-        
+
         // Stop speaking animation (if any)
         if (this.speakingAnimation) {
             clearInterval(this.speakingAnimation);
             this.speakingAnimation = null;
         }
-        
+
         // DON'T reset head rotation - let natural movement continue
         // (Head movement will be handled by continuous animation loop)
-        
+
         // Reset mouth morph targets
         if (this.morphTargets && this.morphTargets.morphTargetInfluences) {
             for (let i = 0; i < this.morphTargets.morphTargetInfluences.length; i++) {
@@ -985,19 +1081,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Sidebar Toggle Logic
 document.addEventListener("DOMContentLoaded", () => {
-  const sidebar = document.getElementById("sidebar");
-  const openBtn = document.getElementById("openSidebar");
-  const closeBtn = document.getElementById("closeSidebar");
+    const sidebar = document.getElementById("sidebar");
+    const openBtn = document.getElementById("openSidebar");
+    const closeBtn = document.getElementById("closeSidebar");
 
-  openBtn.addEventListener("click", () => {
-    sidebar.classList.add("open");
-    openBtn.style.display = "none";
-  });
+    openBtn.addEventListener("click", () => {
+        sidebar.classList.add("open");
+        openBtn.style.display = "none";
+    });
 
-  closeBtn.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    openBtn.style.display = "block";
-  });
+    closeBtn.addEventListener("click", () => {
+        sidebar.classList.remove("open");
+        openBtn.style.display = "block";
+    });
 });
 
 // Settings Modal Logic, Language & Theme Switcher
