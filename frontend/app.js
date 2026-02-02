@@ -151,16 +151,34 @@ class AvatarAssistant {
         const loginBtn = document.getElementById('loginBtn');
         const loginTitle = document.getElementById('loginTitle');
 
+        // Stronger cleanup of invalid username storage
+        if (this.username) {
+            // Trim and check validity
+            const cleanName = String(this.username).trim();
+            if (cleanName === '' || cleanName === 'null' || cleanName === 'undefined') {
+                console.log('🧹 Clearing invalid username:', this.username);
+                this.username = null;
+                localStorage.removeItem('avatar_username');
+            } else {
+                this.username = cleanName; // Normalize
+            }
+        }
+
         // Check for existing login
         if (this.username) {
+            console.log('✅ Auto-logged in as:', this.username);
             modal.style.display = 'none';
             this.loadHistory();
             this.updateStatus(this.t('statusInit'));
         } else {
+            console.log('👤 No valid session. Waiting for user login...');
+            // Force display and clear input
             modal.style.display = 'flex';
+            usernameInput.value = '';
+            usernameInput.focus();
         }
 
-        loginBtn.addEventListener('click', async () => {
+        const handleLogin = async () => {
             const username = usernameInput.value.trim();
             if (username) {
                 this.username = username;
@@ -181,6 +199,13 @@ class AvatarAssistant {
                 this.loadHistory();
                 this.updateStatus(this.t('statusInit'));
             }
+        };
+
+        loginBtn.addEventListener('click', handleLogin);
+
+        // Add Enter key support for login
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
         });
 
         // Logout
@@ -203,6 +228,13 @@ class AvatarAssistant {
             sessions.forEach(session => {
                 const li = document.createElement('li');
                 li.textContent = session.title || new Date(session.created_at).toLocaleString();
+                li.dataset.sessionId = session.id;
+
+                // Highlight active session
+                if (session.id === this.sessionId) {
+                    li.classList.add('active');
+                }
+
                 li.onclick = () => this.loadSession(session.id);
                 chatList.appendChild(li);
             });
@@ -225,8 +257,14 @@ class AvatarAssistant {
                 this.addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai');
             });
 
+            // Update active session highlight
+            this.loadHistory();
+
             // Close sidebar on mobile
-            document.getElementById('sidebar').classList.remove('open');
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('openSidebar').style.display = 'block';
+            }
 
         } catch (e) {
             console.error("Failed to load session:", e);
@@ -238,10 +276,10 @@ class AvatarAssistant {
         // Avatar mapping with high-quality presets for each language
         // All avatars use Ready Player Me modular characters
         const avatarMapping = {
-            'en': 'https://models.readyplayer.me/64b73b52627443194511ee40.glb', // Neutral professional
-            'fa': 'https://models.readyplayer.me/64b73bd5853b0e3532386400.glb', // Middle eastern inspired
-            'nan': 'https://models.readyplayer.me/64b73c49627443194511ef5e.glb', // East asian inspired
-            'yo': 'https://models.readyplayer.me/64b73ca7853b0e3532386566.glb'  // African inspired
+            'en': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb',
+            'fa': 'https://models.readyplayer.me/691df9fa1aa3af821a157927.glb',
+            'nan': 'https://models.readyplayer.me/691dfb04fb99478e41171cd4.glb',
+            'yo': 'https://models.readyplayer.me/69273d8a132e61458cd9f86e.glb'
         };
 
         const baseUrl = avatarMapping[this.currentLang] || avatarMapping['en'];
@@ -859,7 +897,8 @@ class AvatarAssistant {
                     body: JSON.stringify({
                         message,
                         session_id: this.sessionId, // Send session ID to maintain conversation
-                        preferred_language: this.currentLang // Send user's selected language
+                        preferred_language: this.currentLang, // Send user's selected language
+                        username: this.username // Tie session to logged-in user
                     }),
                 });
 
@@ -876,6 +915,9 @@ class AvatarAssistant {
 
                 // Add AI response to chat
                 this.addMessage(data.response, 'ai');
+
+                // Refresh sidebar to show new session
+                this.loadHistory();
 
                 // Play the speech with the response text for lip sync
                 if (data.audioUrl) {
@@ -1071,12 +1113,57 @@ class AvatarAssistant {
             console.log('🔄 Reset all morph targets to 0');
         }
     }
+
+    startNewChat() {
+        console.log('🔄 Starting new chat...');
+        this.sessionId = null;
+        this.updateStatus(this.t('statusInit'));
+
+        // Clear chat messages
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) {
+            chatMessages.innerHTML = `
+                <div class="message ai-message" data-i18n="welcomeMessage">
+                    ${this.t('welcomeMessage')}
+                </div>
+            `;
+        }
+
+        // Close sidebar on mobile
+        if (window.innerWidth <= 768) {
+            const sidebar = document.getElementById("sidebar");
+            const openBtn = document.getElementById("openSidebar");
+            if (sidebar && openBtn) {
+                sidebar.classList.remove("open");
+                openBtn.style.display = "block";
+            }
+        }
+    }
 }
 
 // Initialize the application when the page loads
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Theme from LocalStorage
+    const storedTheme = localStorage.getItem('avatar_theme');
+    if (storedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        const themeSelect = document.getElementById("themeSelect");
+        if (themeSelect) themeSelect.value = 'light';
+    }
+
+    // 2. Initialize Avatar Assistant
     window.avatarInstance = new AvatarAssistant();
     console.log('💡 Debug: Access avatar instance via window.avatarInstance');
+
+    // 3. Setup New Chat Button
+    const newChatBtn = document.getElementById('newChatBtn');
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+            if (window.avatarInstance) {
+                window.avatarInstance.startNewChat();
+            }
+        });
+    }
 });
 
 // Sidebar Toggle Logic
@@ -1133,8 +1220,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     const theme = themeSelect.value;
                     if (theme === 'light') {
                         document.body.classList.add('light-mode');
+                        localStorage.setItem('avatar_theme', 'light');
                     } else {
                         document.body.classList.remove('light-mode');
+                        localStorage.setItem('avatar_theme', 'dark');
                     }
                     console.log("Theme set to:", theme);
                 }

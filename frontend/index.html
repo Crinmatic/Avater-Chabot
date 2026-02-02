@@ -548,6 +548,11 @@
             background-color: #3c3c3c;
         }
 
+        .chat-list li.active {
+            background-color: #4c4c4c;
+            border-left: 3px solid var(--neon-cyan);
+        }
+
         /* Sidebar toggle button */
         .open-sidebar-btn {
             position: fixed;
@@ -989,7 +994,7 @@
             <button id="closeSidebar">×</button>
         </div>
         <div class="sidebar-content">
-            <button class="sidebar-btn" data-i18n="newChat">New Chat</button>
+            <button id="newChatBtn" class="sidebar-btn" data-i18n="newChat">New Chat</button>
             <button id="settingsBtn" class="sidebar-btn" data-i18n="settings">Settings</button>
             <h3 class="sidebar-section" data-i18n="historyTitle">Chats</h3>
             <ul class="chat-list">
