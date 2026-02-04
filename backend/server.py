@@ -71,7 +71,7 @@ class AIAssistantServer:
         # Configuration
         self.tts_url = "http://localhost:8000/synthesize"
         self.port = int(os.getenv("PORT", 3000))
-        self.groq_api_key = "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"
+        self.groq_api_key = ""
         self.groq_api_url = "https://api.groq.com/openai/v1/chat/completions"
         self.model_name = "llama-3.3-70b-versatile"
         
