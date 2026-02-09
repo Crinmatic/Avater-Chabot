@@ -1043,8 +1043,30 @@
     </div>
 
 
+    <!-- Safety Disclaimer Modal -->
+    <div id="safetyModal" class="modal" style="display: flex;">
+        <div class="modal-content" style="text-align: center; max-width: 600px;">
+            <h2 data-i18n="safetyTitle">Safety & Research Disclaimer</h2>
+            <div style="text-align: left; padding: 15px; font-size: 0.95em; line-height: 1.5;">
+                <p><strong>🤖 I am an AI, not a Person:</strong> I was built by Ontario Tech students to help other students with
+                    General Wellness. I am not a replacement for professional therapy of any sort.</p>
+                <p><strong>🌍 Multilingual Support:</strong> I can understand English, Yoruba, and Persian. Feel free to switch languages!
+                </p>
+                <p><strong>🆘 Safety First:</strong> I cannot help in a life-threatening emergency. If you are in crisis, please
+                    contact Emergency Services (911) or Suicide and Crisis Lifeline (988).</p>
+                <p><strong>📝 Research Use:</strong> By clicking "Accept," you agree to interact with this AI for research purposes.</p>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                <button id="declineBtn" class="save-btn" style="background: #555; width: auto; padding: 10px 20px;">Decline</button>
+                <button id="acceptBtn" class="save-btn"
+                    style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue)); width: auto; padding: 10px 20px;">I
+                    Understand & Accept</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Modal -->
-    <div id="loginModal" class="modal" style="display: flex;">
+    <div id="loginModal" class="modal" style="display: none;">
         <div class="modal-content" style="text-align: center;">
             <h2 id="loginTitle" data-i18n="loginTitle">Welcome</h2>
             <div class="setting" style="display: block;">

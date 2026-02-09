@@ -151,6 +151,90 @@ class AvatarAssistant {
         const loginBtn = document.getElementById('loginBtn');
         const loginTitle = document.getElementById('loginTitle');
 
+        // Safety Modal Logic
+        const safetyModal = document.getElementById('safetyModal');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const declineBtn = document.getElementById('declineBtn');
+        const hasAcceptedSafety = localStorage.getItem('avatar_safety_accepted');
+
+        // Initial check
+        if (!hasAcceptedSafety) {
+            safetyModal.style.display = 'flex';
+            modal.style.display = 'none';
+        } else {
+            safetyModal.style.display = 'none';
+            this.checkLoginState(modal, usernameInput);
+        }
+
+        // Attach listeners with cloning to remove old ones
+        if (acceptBtn) {
+            const newAcceptBtn = acceptBtn.cloneNode(true);
+            acceptBtn.parentNode.replaceChild(newAcceptBtn, acceptBtn);
+
+            newAcceptBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('✅ Safety Disclaimer Accepted');
+                localStorage.setItem('avatar_safety_accepted', 'true');
+                safetyModal.style.display = 'none';
+                this.checkLoginState(modal, usernameInput);
+            });
+        }
+
+        if (declineBtn) {
+            declineBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert("You must accept the safety disclaimer to use this application.");
+                window.location.href = "https://google.com";
+            });
+        }
+
+        // Login Logic
+        const handleLogin = async () => {
+            const username = usernameInput.value.trim();
+            if (username) {
+                this.username = username;
+                localStorage.setItem('avatar_username', username);
+                modal.style.display = 'none';
+
+                // Register user in backend
+                try {
+                    await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username })
+                    });
+                } catch (e) {
+                    console.error("Login sync failed:", e);
+                }
+
+                this.loadHistory();
+                this.updateStatus(this.t('statusInit'));
+            }
+        };
+
+        // Attach login listeners
+        const newLoginBtn = loginBtn.cloneNode(true);
+        loginBtn.parentNode.replaceChild(newLoginBtn, loginBtn);
+        newLoginBtn.addEventListener('click', handleLogin);
+
+        // Add Enter key support for login
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            const newLogoutBtn = logoutBtn.cloneNode(true);
+            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+            newLogoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('avatar_username');
+                location.reload();
+            });
+        }
+    }
+
+    checkLoginState(modal, usernameInput) {
         // Stronger cleanup of invalid username storage
         if (this.username) {
             // Trim and check validity
@@ -177,43 +261,8 @@ class AvatarAssistant {
             usernameInput.value = '';
             usernameInput.focus();
         }
-
-        const handleLogin = async () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-                this.username = username;
-                localStorage.setItem('avatar_username', username);
-                modal.style.display = 'none';
-
-                // Register user in backend
-                try {
-                    await fetch('/api/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username })
-                    });
-                } catch (e) {
-                    console.error("Login sync failed:", e);
-                }
-
-                this.loadHistory();
-                this.updateStatus(this.t('statusInit'));
-            }
-        };
-
-        loginBtn.addEventListener('click', handleLogin);
-
-        // Add Enter key support for login
-        usernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleLogin();
-        });
-
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('avatar_username');
-            location.reload();
-        });
     }
+
 
     async loadHistory() {
         if (!this.username) return;
