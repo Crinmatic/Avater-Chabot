@@ -69,9 +69,15 @@ class AIAssistantServer:
         self.app = FastAPI(title="AI Avatar Assistant", version="2.0.0")
         
         # Configuration
+        # Environment and API Keys
+        from dotenv import load_dotenv
+        load_dotenv()
+        
         self.tts_url = "http://localhost:8000/synthesize"
         self.port = int(os.getenv("PORT", 3000))
-        self.groq_api_key = ""
+        self.groq_api_key = os.getenv("GROQ_API_KEY")
+        if not self.groq_api_key:
+            logger.warning("GROQ_API_KEY not found in environment variables.")
         self.groq_api_url = "https://api.groq.com/openai/v1/chat/completions"
         self.model_name = "llama-3.3-70b-versatile"
         
@@ -211,12 +217,12 @@ class AIAssistantServer:
                 
                 # 1. Handle Session
                 session_id = request.session_id
+                username = request.username if request.username else "guest"
                 
                 # If no session ID, create new session
                 if not session_id or session_id == "null":
                     session_id = str(uuid.uuid4())
                     title = request.message[:30] + "..." if len(request.message) > 30 else request.message
-                    username = request.username if request.username else "guest"
                     
                     # Ensure user exists if it's a guest or new user logic hasn't run
                     cursor.execute("INSERT OR IGNORE INTO users (username) VALUES (?)", (username,))
@@ -227,18 +233,12 @@ class AIAssistantServer:
                     logger.info(f"Created new session {session_id} for user {username}")
                 
                 # 2. Get History for Context
-                cursor.execute("SELECT content FROM messages WHERE session_id = ? ORDER BY id ASC LIMIT 10", (session_id,))
-                rows = cursor.fetchall()
-                # Construct history list for AI context: [User, AI, User, AI...]
-                # Note: This simple fetch doesn't separate roles perfectly for context if we just read content.
-                # Use a better query to reconstruct pairs if needed, or just persist logic.
-                # For now, let's fetch role/content relative to the session for context.
-                cursor.execute("SELECT role, content FROM messages WHERE session_id = ? ORDER BY id ASC", (session_id,))
+                cursor.execute("SELECT role, content FROM messages WHERE session_id = ? ORDER BY id ASC LIMIT 10", (session_id,))
                 history_rows = cursor.fetchall()
                 
                 history_content = []
                 for row in history_rows:
-                    history_content.append(row['content']) # Just list of strings as per original logic expectation
+                    history_content.append(row['content'])
                 
                 # 3. Save User Message
                 cursor.execute("INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)", 
@@ -246,13 +246,8 @@ class AIAssistantServer:
                 conn.commit()
                 
                 # 4. Generate AI Response
-                # Note: history_content currently contains ALL messages. 
-                # Ideally, we should filter or format it as the `generate_response` expects alternating format.
-                # The original `generate_response` expected a list of strings [User, AI, User, AI].
-                # We can replicate that structure.
-                
-                logger.info(f"Generating response for session {session_id}")
-                ai_response = await self.generate_response(request.message, history_content, request.preferred_language)
+                logger.info(f"Generating response for session {session_id} (User: {username})")
+                ai_response = await self.generate_response(request.message, history_content, request.preferred_language, username)
                 
                 # 5. Save AI Response
                 cursor.execute("INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)", 
@@ -292,7 +287,7 @@ class AIAssistantServer:
         # Mount audio directory
         self.app.mount("/audio", StaticFiles(directory=str(self.audio_dir)), name="audio")
 
-    async def generate_response(self, user_message: str, history: list, preferred_lang: str = 'en') -> str:
+    async def generate_response(self, user_message: str, history: list, preferred_lang: str = 'en', username: str = 'Student') -> str:
         """Generate AI response using Groq API with strict language enforcement"""
         try:
             # Language mapping for instructions
@@ -340,6 +335,10 @@ Refer to these specific departments based on user needs:
 - **Study Skills/Tutoring:** Direct to the Student Learning Centre (studentlearning@ontariotechu.ca).
 - **Accessibility/Accommodations:** Direct to Student Accessibility Services (studentaccessibility@ontariotechu.ca).
 - **General Wellness:** Suggest the "Wellness Nook" (otsu.ca/services/wellness-nook) or Peer Mentors.
+
+# USER CONTEXT
+- **User's Name:** {username}
+- **Instruction:** Address the user as "{username}" naturally throughout your responses to build rapport. For example: "I understand how you feel, {username}."
 
 # OPERATIONAL CONSTRAINTS
 1. NEVER "give up" on a conversation because a user is being difficult; remain a supportive presence.

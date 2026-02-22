@@ -207,6 +207,7 @@ class AvatarAssistant {
                     console.error("Login sync failed:", e);
                 }
 
+                this.displayUsername(); // NEW: Display name on top
                 this.loadHistory();
                 this.updateStatus(this.t('statusInit'));
             }
@@ -252,6 +253,7 @@ class AvatarAssistant {
         if (this.username) {
             console.log('✅ Auto-logged in as:', this.username);
             modal.style.display = 'none';
+            this.displayUsername(); // NEW: Display name on top
             this.loadHistory();
             this.updateStatus(this.t('statusInit'));
         } else {
@@ -263,6 +265,14 @@ class AvatarAssistant {
         }
     }
 
+
+    displayUsername() {
+        const displayEl = document.getElementById('userNameDisplay');
+        if (displayEl && this.username) {
+            displayEl.textContent = `Logged in as: ${this.username}`;
+            displayEl.style.display = 'block';
+        }
+    }
 
     async loadHistory() {
         if (!this.username) return;
@@ -506,7 +516,8 @@ class AvatarAssistant {
 
         // Natural idle animations
         if (this.avatar && !this.isLoading) {
-            // Gentle head movements (only when not speaking)
+            // Procedural head movements DISABLED for static body pose
+            /*
             if (this.avatar.children[0] && !this.isSpeaking) {
                 // Very subtle head sway (side to side - Y rotation)
                 this.avatar.children[0].rotation.y = Math.sin(time * 0.3) * 0.02;
@@ -514,6 +525,7 @@ class AvatarAssistant {
                 // Tiny head tilt (Z rotation)
                 this.avatar.children[0].rotation.z = Math.sin(time * 0.25) * 0.01;
             }
+            */
 
             // Eye blinking using morph targets
             this.updateBlink(time);

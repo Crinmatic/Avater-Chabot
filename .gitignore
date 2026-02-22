@@ -5,3 +5,4 @@ __pycache__/
 backend/database.db
 *.db
 .DS_Store
+audio/
