@@ -256,7 +256,11 @@ class AIAssistantServer:
                 conn.close()
                 
                 # 6. TTS Generation
-                audio_url = await self.text_to_speech(ai_response, request.preferred_language)
+                try:
+                    audio_url = await self.text_to_speech(ai_response, request.preferred_language)
+                except Exception as tts_err:
+                    logger.error(f"TTS failure: {tts_err}")
+                    audio_url = None # Continue without audio if TTS fails
                 
                 return ChatResponse(
                     response=ai_response,
@@ -265,8 +269,10 @@ class AIAssistantServer:
                 )
                 
             except Exception as e:
-                logger.error(f"Error in chat endpoint: {e}")
-                raise HTTPException(status_code=500, detail="Internal server error")
+                logger.error(f"Critical error in chat_endpoint: {str(e)}")
+                import traceback
+                logger.error(traceback.format_exc())
+                raise HTTPException(status_code=500, detail=f"Assistant error: {str(e)}")
         
         @self.app.get("/app.js")
         async def serve_js():
@@ -372,6 +378,13 @@ STRICTLY use {target_lang} only."""}
             
             # Add current message
             messages.append({"role": "user", "content": user_message})
+            
+            # Detailed debug logging
+            logger.info(f"--- LLM REQUEST DATA ---")
+            logger.info(f"Target Language: {target_lang}")
+            logger.info(f"System Prompt Username: {username}")
+            logger.info(f"Total History Messages: {len(history)}")
+            logger.info(f"-------------------------")
             
             # Call Groq API
             async with httpx.AsyncClient(timeout=30.0) as client:

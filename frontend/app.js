@@ -915,9 +915,9 @@ class AvatarAssistant {
 
         // Apply subtle eye direction changes to head rotation (only when not speaking)
         // Only side-to-side, no up/down
-        if (!this.isSpeaking) {
-            this.avatar.children[0].rotation.y += this.currentLook.x;
-            // rotation.x removed - no vertical head movement
+        if (!this.isSpeaking && this.avatar.children[0]) {
+            // Set rotation directly instead of adding to it to prevent "spinning"
+            this.avatar.children[0].rotation.y = this.currentLook.x;
         }
     }
 
