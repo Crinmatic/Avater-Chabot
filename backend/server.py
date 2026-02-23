@@ -211,6 +211,7 @@ class AIAssistantServer:
 
         @self.app.post("/api/chat", response_model=ChatResponse)
         async def chat_endpoint(request: ChatRequest):
+            conn = None
             try:
                 conn = self.get_db()
                 cursor = conn.cursor()
@@ -232,12 +233,13 @@ class AIAssistantServer:
                     conn.commit()
                     logger.info(f"Created new session {session_id} for user {username}")
                 
-                # 2. Get History for Context
-                cursor.execute("SELECT role, content FROM messages WHERE session_id = ? ORDER BY id ASC LIMIT 10", (session_id,))
+                # 2. Get History for Context (Fetch LAST 15 for moving context window)
+                cursor.execute("SELECT role, content FROM messages WHERE session_id = ? ORDER BY id DESC LIMIT 15", (session_id,))
                 history_rows = cursor.fetchall()
                 
+                # Reverse to get chronological order (oldest to newest)
                 history_content = []
-                for row in history_rows:
+                for row in reversed(history_rows):
                     history_content.append(row['content'])
                 
                 # 3. Save User Message
@@ -246,20 +248,19 @@ class AIAssistantServer:
                 conn.commit()
                 
                 # 4. Generate AI Response
-                logger.info(f"Generating response for session {session_id} (User: {username})")
+                logger.info(f"Generating response for session {session_id} (User: {username}, Lang: {request.preferred_language})")
                 ai_response = await self.generate_response(request.message, history_content, request.preferred_language, username)
                 
                 # 5. Save AI Response
                 cursor.execute("INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)", 
                               (session_id, "ai", ai_response))
                 conn.commit()
-                conn.close()
                 
                 # 6. TTS Generation
                 try:
                     audio_url = await self.text_to_speech(ai_response, request.preferred_language)
                 except Exception as tts_err:
-                    logger.error(f"TTS failure: {tts_err}")
+                    logger.error(f"TTS functional failure: {tts_err}")
                     audio_url = None # Continue without audio if TTS fails
                 
                 return ChatResponse(
@@ -269,10 +270,14 @@ class AIAssistantServer:
                 )
                 
             except Exception as e:
-                logger.error(f"Critical error in chat_endpoint: {str(e)}")
+                logger.error(f"CRITICAL ERROR in chat_endpoint: {str(e)}")
                 import traceback
                 logger.error(traceback.format_exc())
                 raise HTTPException(status_code=500, detail=f"Assistant error: {str(e)}")
+            finally:
+                if conn:
+                    conn.close()
+                    logger.debug(f"Database connection closed for session {request.session_id}")
         
         @self.app.get("/app.js")
         async def serve_js():

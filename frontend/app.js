@@ -1018,6 +1018,14 @@ class AvatarAssistant {
             // Store the response text for lip sync
             this.currentResponseText = responseText || '';
 
+            // NEW: Stop any existing audio before starting new playback
+            if (this.currentAudio) {
+                console.log('🔇 Stopping previous audio');
+                this.currentAudio.pause();
+                this.currentAudio.currentTime = 0;
+                this.stopSpeaking(); // Reset speaking state
+            }
+
             // Create new audio element
             const audio = new Audio(audioUrl);
             this.currentAudio = audio;
