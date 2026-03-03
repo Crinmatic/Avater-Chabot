@@ -1224,15 +1224,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.avatarInstance = new AvatarAssistant();
     console.log('💡 Debug: Access avatar instance via window.avatarInstance');
 
-    // 3. Setup New Chat Button
-    const newChatBtn = document.getElementById('newChatBtn');
-    if (newChatBtn) {
-        newChatBtn.addEventListener('click', () => {
-            if (window.avatarInstance) {
-                window.avatarInstance.startNewChat();
-            }
-        });
+    // 3. Initialize Settings Defaults
+    if (!localStorage.getItem('avatar_language')) {
+        localStorage.setItem('avatar_language', 'en');
     }
+    const storedLang = localStorage.getItem('avatar_language');
+    setLanguage(storedLang);
+    const langSelect = document.getElementById("languageSelect");
+    if (langSelect) langSelect.value = storedLang;
+
+    const storedVoice = localStorage.getItem('avatar_voice') || 'male';
+    const voiceSelect = document.getElementById("voiceSelect");
+    if (voiceSelect) voiceSelect.value = storedVoice;
+
+    // 4. Setup New Chat Button
 });
 
 // Sidebar Toggle Logic
@@ -1295,6 +1300,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         localStorage.setItem('avatar_theme', 'dark');
                     }
                     console.log("Theme set to:", theme);
+                }
+
+                // 3. Handle Voice (persist for future sessions)
+                const voiceSelect = document.getElementById("voiceSelect");
+                if (voiceSelect) {
+                    localStorage.setItem('avatar_voice', voiceSelect.value);
+                    console.log("Voice set to:", voiceSelect.value);
+                }
+
+                // 4. Persistence for Language
+                if (languageSelect) {
+                    localStorage.setItem('avatar_language', languageSelect.value);
                 }
 
                 // Close Modal

@@ -173,20 +173,13 @@
 
         #avatar-container.speaking {
             border-color: var(--neon-cyan);
-            animation: speaking-pulse 1s ease-in-out infinite;
             box-shadow: 0 0 80px rgba(0, 229, 255, 0.6), 0 0 120px rgba(230, 59, 122, 0.4);
         }
 
-        @keyframes speaking-pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-                border-color: var(--neon-cyan);
-            }
+        @keyframes dummy-placeholder {
+            /* Removed speaking-pulse */
 
             50% {
-                transform: scale(1.02);
                 border-color: var(--neon-pink);
             }
         }
@@ -1040,9 +1033,9 @@
 
             <div class="setting">
                 <label data-i18n="voice">Avatar Voice:</label>
-                <select>
-                    <option>Male</option>
-                    <option>Female</option>
+                <select id="voiceSelect">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
                 </select>
             </div>
 
