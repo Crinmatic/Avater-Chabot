@@ -1233,10 +1233,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const langSelect = document.getElementById("languageSelect");
     if (langSelect) langSelect.value = storedLang;
 
-    const storedVoice = localStorage.getItem('avatar_voice') || 'male';
-    const voiceSelect = document.getElementById("voiceSelect");
-    if (voiceSelect) voiceSelect.value = storedVoice;
-
     // 4. Setup New Chat Button
 });
 
@@ -1302,14 +1298,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log("Theme set to:", theme);
                 }
 
-                // 3. Handle Voice (persist for future sessions)
-                const voiceSelect = document.getElementById("voiceSelect");
-                if (voiceSelect) {
-                    localStorage.setItem('avatar_voice', voiceSelect.value);
-                    console.log("Voice set to:", voiceSelect.value);
-                }
-
-                // 4. Persistence for Language
+                // 3. Persistence for Language
                 if (languageSelect) {
                     localStorage.setItem('avatar_language', languageSelect.value);
                 }
