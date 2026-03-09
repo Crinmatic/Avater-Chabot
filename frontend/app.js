@@ -46,8 +46,9 @@ class AvatarAssistant {
         this.morphTargets = null;
         this.sessionId = null; // Track session ID for conversation memory
         this.sessionId = null; // Track session ID for conversation memory
-        this.currentLang = 'en'; // Default Menu Language
+        this.currentLang = localStorage.getItem('avatar_language') || 'en';
         this.username = localStorage.getItem('avatar_username'); // Check if logged in
+        this.avatarLoadRequestId = 0;
 
         // --- NEW: Login & History Management Setup ---
         this.setupLogin();
@@ -352,6 +353,7 @@ class AvatarAssistant {
 
     loadAvatar() {
         const loader = new THREE.GLTFLoader();
+        const requestId = ++this.avatarLoadRequestId;
 
         // Ready Player Me API - Request avatar with morph targets
         // Documentation: https://docs.readyplayer.me/ready-player-me/api-reference/rest-api/avatars/get-3d-avatars
@@ -367,6 +369,22 @@ class AvatarAssistant {
         loader.load(
             avatarUrl,
             (gltf) => {
+                if (requestId !== this.avatarLoadRequestId) {
+                    gltf.scene.traverse((child) => {
+                        if (child.isMesh) {
+                            if (child.geometry) child.geometry.dispose();
+                            if (child.material) {
+                                if (Array.isArray(child.material)) {
+                                    child.material.forEach((material) => material.dispose());
+                                } else {
+                                    child.material.dispose();
+                                }
+                            }
+                        }
+                    });
+                    return;
+                }
+
                 this.avatar = gltf.scene;
                 this.avatar.scale.set(1, 1, 1);
                 this.avatar.position.set(0, 0, 0);
@@ -453,10 +471,18 @@ class AvatarAssistant {
                 this.enableChat();
             },
             (progress) => {
+                if (requestId !== this.avatarLoadRequestId) {
+                    return;
+                }
+
                 const percent = Math.round((progress.loaded / progress.total) * 100);
                 this.updateStatus(`Loading avatar... ${percent}%`);
             },
             (error) => {
+                if (requestId !== this.avatarLoadRequestId) {
+                    return;
+                }
+
                 console.error('Error loading avatar:', error);
                 this.updateStatus('Failed to load avatar. Please check your connection.');
             }
@@ -1220,11 +1246,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (themeSelect) themeSelect.value = 'light';
     }
 
-    // 2. Initialize Avatar Assistant
-    window.avatarInstance = new AvatarAssistant();
-    console.log('💡 Debug: Access avatar instance via window.avatarInstance');
-
-    // 3. Initialize Settings Defaults
     if (!localStorage.getItem('avatar_language')) {
         localStorage.setItem('avatar_language', 'en');
     }
@@ -1232,6 +1253,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setLanguage(storedLang);
     const langSelect = document.getElementById("languageSelect");
     if (langSelect) langSelect.value = storedLang;
+
+    // 2. Initialize Avatar Assistant
+    window.avatarInstance = new AvatarAssistant();
+    console.log('💡 Debug: Access avatar instance via window.avatarInstance');
 
     // 4. Setup New Chat Button
 });
