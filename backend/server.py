@@ -342,10 +342,11 @@ If the user expresses thoughts of self-harm, hopelessness (e.g., "I can't do thi
 
 # ONTARIO TECH RESOURCE MAPPING
 Refer to these specific departments based on user needs:
-- **Academic Stress (Grades/MSAFs/Failing):** Direct to Academic Advising (science.advising@ontariotechu.ca) or ontariotechu.ca/academicadvising.
+- **Academic Inquiries:** For degrees, courses, failing grades, MSAFs, or academic advising questions, direct users to academic.advising@ontariotechu.ca.
 - **Study Skills/Tutoring:** Direct to the Student Learning Centre (studentlearning@ontariotechu.ca).
 - **Accessibility/Accommodations:** Direct to Student Accessibility Services (studentaccessibility@ontariotechu.ca).
 - **General Wellness:** Suggest the "Wellness Nook" (otsu.ca/services/wellness-nook) or Peer Mentors.
+- **General Inquiries Outside Scope:** For questions outside wellness support, task help, or basic academic help, direct users to connect@ontariotechu.ca.
 
 # USER CONTEXT
 - **User's Name:** {username}
@@ -356,6 +357,10 @@ Refer to these specific departments based on user needs:
 2. NEVER agree with harmful or distorted reality statements.
 3. NEVER write full assignments for students.
 4. ALWAYS prioritize safety over task-management advice.
+5. Keep every response under 110 words.
+6. Keep answers brief and actionable.
+7. End most interactions with a short follow-up question.
+8. If space is tight, prioritize safety instructions and referral contacts over conversational filler.
 
 STRICTLY use {target_lang} only."""}
             ]
@@ -390,8 +395,7 @@ STRICTLY use {target_lang} only."""}
             logger.info(f"System Prompt Username: {username}")
             logger.info(f"Total History Messages: {len(history)}")
             logger.info(f"-------------------------")
-            
-            # Call Groq API
+
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     self.groq_api_url,
@@ -403,23 +407,55 @@ STRICTLY use {target_lang} only."""}
                         "model": self.model_name,
                         "messages": messages,
                         "temperature": 0.8,
-                        "max_tokens": 150,
+                        "max_tokens": 220,
                         "top_p": 0.92,
                         "stream": False
                     }
                 )
-                
+
                 if response.status_code != 200:
                     logger.error(f"Groq API error: {response.status_code} - {response.text}")
                     return self.get_fallback_response(user_message)
-                
+
                 result = response.json()
-                ai_response = result["choices"][0]["message"]["content"].strip()
-                
+                choice = result["choices"][0]
+                ai_response = choice["message"]["content"].strip()
+                finish_reason = choice.get("finish_reason")
+
+                if finish_reason == "length" and ai_response:
+                    continuation_messages = messages + [
+                        {"role": "assistant", "content": ai_response},
+                        {
+                            "role": "user",
+                            "content": "Continue from exactly where you stopped. Do not repeat anything. Finish the thought briefly."
+                        },
+                    ]
+                    continuation_response = await client.post(
+                        self.groq_api_url,
+                        headers={
+                            "Authorization": f"Bearer {self.groq_api_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "model": self.model_name,
+                            "messages": continuation_messages,
+                            "temperature": 0.6,
+                            "max_tokens": 80,
+                            "top_p": 0.9,
+                            "stream": False
+                        }
+                    )
+
+                    if continuation_response.status_code == 200:
+                        continuation_result = continuation_response.json()
+                        continuation_text = continuation_result["choices"][0]["message"]["content"].strip()
+                        if continuation_text:
+                            ai_response = f"{ai_response} {continuation_text}".strip()
+
                 # Fallback if response is empty
                 if not ai_response or len(ai_response) < 5:
                     return self.get_fallback_response(user_message)
-                
+
                 return ai_response
 
         except Exception as e:
