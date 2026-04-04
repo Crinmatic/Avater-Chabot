@@ -83,10 +83,12 @@ class AIAssistantServer:
         
         # Paths
         self.base_dir = Path(__file__).parent.parent
+        self.avatars_dir = self.base_dir / "avatars"
         self.audio_dir = self.base_dir / "audio"
         self.db_path = self.base_dir / "backend" / "database.db"
         
         # Create directories
+        self.avatars_dir.mkdir(exist_ok=True)
         self.audio_dir.mkdir(exist_ok=True)
         
         # Initialize Database
@@ -297,6 +299,7 @@ class AIAssistantServer:
 
         # Mount audio directory
         self.app.mount("/audio", StaticFiles(directory=str(self.audio_dir)), name="audio")
+        self.app.mount("/avatars", StaticFiles(directory=str(self.avatars_dir)), name="avatars")
 
     async def generate_response(self, user_message: str, history: list, preferred_lang: str = 'en', username: str = 'Student') -> str:
         """Generate AI response using Groq API with strict language enforcement"""

@@ -332,23 +332,14 @@ class AvatarAssistant {
     }
 
     getAvatarUrl() {
-        // Avatar mapping based on selected language
-        // Avatar mapping with high-quality presets for each language
-        // All avatars use Ready Player Me modular characters
         const avatarMapping = {
-            'en': 'https://models.readyplayer.me/68dfbe6efedc24530045d33f.glb',
-            'fa': 'https://models.readyplayer.me/691df9fa1aa3af821a157927.glb',
-            'nan': 'https://models.readyplayer.me/691dfb04fb99478e41171cd4.glb',
-            'yo': 'https://models.readyplayer.me/69273d8a132e61458cd9f86e.glb'
+            'en': '/avatars/avatar-AKMPFCO84XRsp9Kgx3qe_english.glb',
+            'fa': '/avatars/avatar-5mAeZVpB5t6PG3QANl43_persian.glb',
+            'nan': '/avatars/avatar-AKMPFCO84XRsp9Kgx3qe_english.glb',
+            'yo': '/avatars/avatar-3inIyD4YR3IPH5iwojPZ_yoruba.glb'
         };
 
-        const baseUrl = avatarMapping[this.currentLang] || avatarMapping['en'];
-        // Highest quality settings:
-        // - morphTargets: ARKit + Oculus Visemes for lip sync
-        // - lod=0: Highest geometry detail
-        // - textureAtlas=none: Separate high-res textures
-        // - quality=high: Maximum texture resolution
-        return `${baseUrl}?morphTargets=ARKit,Oculus%20Visemes&lod=0&textureAtlas=none&quality=high`;
+        return avatarMapping[this.currentLang] || avatarMapping['en'];
     }
 
     loadAvatar() {
@@ -395,11 +386,17 @@ class AvatarAssistant {
                         child.castShadow = true;
                         child.receiveShadow = true;
 
-                        // Find the HEAD mesh with morph targets for lip sync
-                        // Ready Player Me avatars use Wolf3D_Head or Wolf3D_Avatar for facial animation
+                        // Find the head mesh with morph targets for lip sync.
+                        // Local avatars use Streamoji_Head, while older RPM exports used Wolf3D_* names.
                         if (child.morphTargetInfluences && child.morphTargetInfluences.length > 0) {
                             // Only use the head mesh, not eyes or teeth
-                            if (child.name === 'Wolf3D_Head' || child.name === 'Wolf3D_Avatar' || child.name === 'head') {
+                            if (
+                                child.name === 'Wolf3D_Head' ||
+                                child.name === 'Wolf3D_Avatar' ||
+                                child.name === 'Streamoji_Head' ||
+                                child.name === 'head' ||
+                                child.name === 'Head'
+                            ) {
                                 this.morphTargets = child;
                                 console.log('✅ Found LIP SYNC mesh:', child.name);
                                 console.log('Morph target dictionary:', child.morphTargetDictionary);
