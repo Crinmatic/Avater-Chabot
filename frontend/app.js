@@ -717,7 +717,7 @@ class AvatarAssistant {
         if (jawIndex !== -1) {
             if (isActuallySpeaking) {
                 // Speaking: subtle jaw movement
-                const targetJaw = maxJaw * 0.25 * (0.7 + audioVolume * 0.3); // Volume-modulated
+                const targetJaw = maxJaw * 0.36 * (0.7 + audioVolume * 0.3); // Slightly stronger, still controlled
                 influences[jawIndex] = influences[jawIndex] * 0.9 + targetJaw * 0.1;
             } else {
                 // Silent: jaw closes quickly
@@ -822,7 +822,7 @@ class AvatarAssistant {
             // Minimal jaw movement - barely visible
             const jawIndex = this.findMorphTarget(['jawOpen']);
             if (jawIndex !== -1) {
-                const jawTarget = Math.min(volume * 0.15 + lowFreq * 0.08, 0.08);
+                const jawTarget = Math.min(volume * 0.22 + lowFreq * 0.12, 0.13);
                 influences[jawIndex] = this.smoothValue(influences[jawIndex], jawTarget, 0.15);
             }
         } else {
